@@ -132,7 +132,7 @@ export default function SearchInterface({
   }, [debouncedQuery, suggestions]);
 
   const inputClass = size === "large" 
-    ? "search-input w-full px-6 py-4 pr-60 rounded-2xl text-lg focus:outline-none"
+    ? "search-input w-full px-6 py-4 pr-60 sm:pr-60 pr-44 rounded-2xl text-lg focus:outline-none"
     : "w-full pl-10 pr-14 py-3 rounded-xl";
 
   const inputOptions = [
@@ -165,8 +165,10 @@ export default function SearchInterface({
         
         {/* Multi-modal input options (only for large size) */}
         {size === "large" && (
-          <div className="absolute right-14 top-1/2 -translate-y-1/2 flex items-center gap-1">
-            {inputOptions.map((option, index) => (
+          <>
+            {/* Desktop version */}
+            <div className="absolute right-14 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-1">
+              {inputOptions.map((option, index) => (
               <Button
                 key={option.label}
                 variant="ghost"
@@ -178,8 +180,25 @@ export default function SearchInterface({
               >
                 <option.icon className="h-4 w-4" />
               </Button>
-            ))}
-          </div>
+              ))}
+            </div>
+            {/* Mobile version - show fewer options */}
+            <div className="absolute right-14 top-1/2 -translate-y-1/2 flex sm:hidden items-center gap-1">
+              {inputOptions.slice(0, 3).map((option, index) => (
+                <Button
+                  key={option.label}
+                  variant="ghost"
+                  size="icon"
+                  className={`h-8 w-8 rounded-lg transition-colors ${option.color}`}
+                  onClick={option.action}
+                  data-testid={`input-option-${option.label.toLowerCase()}`}
+                  title={option.label}
+                >
+                  <option.icon className="h-4 w-4" />
+                </Button>
+              ))}
+            </div>
+          </>
         )}
         
         <Button

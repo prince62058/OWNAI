@@ -20,7 +20,7 @@ export default function Layout({ children }) {
         {/* Main Content Area */}
         <SidebarInset className="flex-1 flex flex-col overflow-hidden">
           {/* Mobile Header with Menu Button */}
-          <div className="md:hidden flex items-center justify-between p-4 border-b border-border bg-card">
+          <div className="md:hidden flex items-center justify-between p-4 border-b border-border bg-background/95 backdrop-blur">
             <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" data-testid="mobile-sidebar-trigger">
@@ -33,10 +33,10 @@ export default function Layout({ children }) {
             </Sheet>
 
             <div className="flex items-center space-x-2">
-              <div className="w-6 h-6 rounded-md flex items-center justify-center">
-                <img src="/ft-logo.png" alt="FrienchTech.Ai" className="w-6 h-6 rounded-md object-contain" />
+              <div className="w-7 h-7 rounded-md flex items-center justify-center">
+                <img src="/ft-logo.png" alt="FrienchTech.Ai" className="w-7 h-7 rounded-md object-contain" />
               </div>
-              <span className="text-lg font-bold">FrienchTech.Ai</span>
+              <span className="text-lg font-bold gradient-text">FrienchTech.Ai</span>
             </div>
 
             <div className="w-10"></div> {/* Spacer for centering */}
