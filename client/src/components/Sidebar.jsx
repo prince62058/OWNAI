@@ -60,16 +60,19 @@ function SidebarComponent() {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <Link href="/" data-testid="sidebar-logo">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                  <Infinity className="size-4" />
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">perplexity</span>
-                </div>
-              </Link>
-            </SidebarMenuButton>
+            <div className="flex items-center justify-between">
+              <SidebarMenuButton size="lg" asChild>
+                <Link href="/" data-testid="sidebar-logo">
+                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                    <Infinity className="size-4" />
+                  </div>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-semibold">perplexity</span>
+                  </div>
+                </Link>
+              </SidebarMenuButton>
+              <SidebarTrigger />
+            </div>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
