@@ -60,8 +60,7 @@ function SidebarComponent() {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <div className="flex items-center justify-between">
-              <SidebarMenuButton size="lg" asChild>
+            <SidebarMenuButton size="lg" asChild>
                 <Link href="/" data-testid="sidebar-logo">
                   <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                     <Infinity className="size-4" />
@@ -72,7 +71,6 @@ function SidebarComponent() {
                 </Link>
               </SidebarMenuButton>
               <SidebarTrigger />
-            </div>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
