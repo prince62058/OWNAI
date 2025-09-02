@@ -39,7 +39,7 @@ export default function Layout({ children }) {
               <div className="w-7 h-7 rounded-md flex items-center justify-center">
                 <img src="/ft-logo.png" alt="FrienchTech.Ai" className="w-7 h-7 rounded-md object-contain" />
               </div>
-              <span className="text-lg font-bold gradient-text">FrienchTech.Ai</span>
+              <span className="text-lg font-bold text-white">FrienchTech.Ai</span>
             </div>
 
             <div className="w-10"></div> {/* Spacer for centering */}
