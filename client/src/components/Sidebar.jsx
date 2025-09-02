@@ -56,8 +56,12 @@ function SidebarComponent() {
   ];
 
   return (
-    <Sidebar collapsible="icon" className="border-r">
-      <SidebarHeader>
+    <>
+      <Sidebar collapsible="icon" className="border-r">
+        <div className="absolute top-4 -right-3 z-50">
+          <SidebarTrigger />
+        </div>
+        <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
@@ -70,7 +74,6 @@ function SidebarComponent() {
                   </div>
                 </Link>
               </SidebarMenuButton>
-              <SidebarTrigger />
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
@@ -190,7 +193,8 @@ function SidebarComponent() {
           )}
         </SidebarMenu>
       </SidebarFooter>
-    </Sidebar>
+      </Sidebar>
+    </>
   );
 }
 
