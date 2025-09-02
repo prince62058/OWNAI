@@ -163,52 +163,83 @@ export default function Landing() {
               <h2 className="text-2xl font-semibold mb-4" data-testid="library-title">Your Library</h2>
               <p className="text-muted-foreground mb-8">Access your search history, saved threads, and collections</p>
               
-              <Card className="p-8 max-w-md mx-auto">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <i className="fas fa-user text-primary text-xl" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2">Sign in or create an account</h3>
-                <p className="text-muted-foreground text-sm mb-6">Unlock Pro Search and History</p>
+              <Card className="relative p-10 max-w-lg mx-auto border-0 bg-gradient-to-br from-card via-card to-card/80 backdrop-blur-xl shadow-2xl rounded-2xl overflow-hidden">
+                {/* Subtle gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 pointer-events-none" />
                 
-                <div className="space-y-3">
+                {/* Floating icon with glow effect */}
+                <div className="relative mb-8 flex justify-center">
+                  <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center shadow-lg backdrop-blur-sm border border-primary/10">
+                    <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                      <i className="fas fa-user text-primary text-2xl" />
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="relative text-center mb-8">
+                  <h3 className="text-2xl font-bold mb-3 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                    Welcome back
+                  </h3>
+                  <p className="text-muted-foreground text-base leading-relaxed">
+                    Sign in to unlock Pro Search, History, and personalized AI assistance
+                  </p>
+                </div>
+                
+                <div className="relative space-y-4">
                   <Button
+                    className="w-full h-12 justify-start text-left bg-white/5 border border-white/10 hover:bg-white/10 hover:border-primary/30 transition-all duration-300 rounded-xl group"
                     variant="outline"
-                    className="w-full justify-start"
                     onClick={() => window.location.href = "/api/login"}
                     data-testid="signin-google"
                   >
-                    <i className="fab fa-google text-lg mr-3" />
-                    Continue with Google
+                    <div className="w-6 h-6 bg-white rounded-lg flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
+                      <i className="fab fa-google text-red-500 text-sm" />
+                    </div>
+                    <span className="font-medium">Continue with Google</span>
                   </Button>
                   
                   <Button
+                    className="w-full h-12 justify-start text-left bg-white/5 border border-white/10 hover:bg-white/10 hover:border-primary/30 transition-all duration-300 rounded-xl group"
                     variant="outline"
-                    className="w-full justify-start"
                     onClick={() => window.location.href = "/api/login"}
                     data-testid="signin-apple"
                   >
-                    <i className="fab fa-apple text-lg mr-3" />
-                    Continue with Apple
+                    <div className="w-6 h-6 bg-black rounded-lg flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
+                      <i className="fab fa-apple text-white text-sm" />
+                    </div>
+                    <span className="font-medium">Continue with Apple</span>
                   </Button>
                   
+                  <div className="relative py-4">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-border/50" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-card px-4 text-muted-foreground font-medium">or continue with</span>
+                    </div>
+                  </div>
+                  
                   <Button
+                    className="w-full h-12 justify-start text-left bg-white/5 border border-white/10 hover:bg-white/10 hover:border-primary/30 transition-all duration-300 rounded-xl group"
                     variant="outline"
-                    className="w-full justify-start"
                     onClick={() => window.location.href = "/api/login"}
                     data-testid="signin-email"
                   >
-                    <i className="fas fa-envelope text-lg mr-3" />
-                    Continue with email
+                    <div className="w-6 h-6 bg-primary/20 rounded-lg flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
+                      <i className="fas fa-envelope text-primary text-sm" />
+                    </div>
+                    <span className="font-medium">Email address</span>
                   </Button>
                   
-                  <div className="pt-2">
+                  <div className="pt-6 text-center">
                     <Button
                       variant="ghost"
                       size="sm"
+                      className="text-primary hover:text-primary/80 hover:bg-primary/10 transition-all duration-300 rounded-lg px-6"
                       onClick={() => window.location.href = "/api/login"}
                       data-testid="sso-signin"
                     >
-                      Single sign-on (SSO)
+                      <span className="text-sm font-medium">Enterprise SSO →</span>
                     </Button>
                   </div>
                 </div>
