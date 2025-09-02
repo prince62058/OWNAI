@@ -42,15 +42,12 @@ export default function Landing() {
 
   return (
     <Layout>
-      
       <main className="flex-1 pb-20 md:pb-0">
         {/* Hero Section with Search */}
         <section className="py-20 px-4 sm:px-6 lg:px-8">
           <div className="container mx-auto max-w-4xl text-center">
             <div className="fade-in">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight" data-testid="hero-title">
-                Where knowledge begins
-              </h1>
+              <h1 className="sm:text-5xl lg:text-6xl mb-6 font-light text-[58px]" data-testid="hero-title">FrienchTech</h1>
               <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto" data-testid="hero-description">
                 Ask anything and get instant, accurate answers with cited sources. 
                 Powered by advanced AI and real-time web search.
@@ -248,7 +245,6 @@ export default function Landing() {
           </div>
         </section>
       </main>
-
       {/* Floating Action Button */}
       <Button
         size="icon"
