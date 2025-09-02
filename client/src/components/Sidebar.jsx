@@ -138,8 +138,6 @@ function SidebarComponent() {
 
       <SidebarFooter>
         <SidebarMenu>
-          
-          
           {isAuthenticated ? (
             <>
               <SidebarMenuItem>
