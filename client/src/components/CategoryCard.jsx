@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, DollarSign, Plane, ShoppingBag, GraduationCap } from "lucide-react";
 import { Link } from "wouter";
 
 const colorClasses = {
@@ -9,8 +9,16 @@ const colorClasses = {
   orange: "bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400",
 };
 
+const iconComponents = {
+  DollarSign,
+  Plane,
+  ShoppingBag,
+  GraduationCap,
+};
+
 export default function CategoryCard({ id, name, description, icon, color, href }) {
   const iconColorClass = colorClasses[color] || colorClasses.blue;
+  const IconComponent = iconComponents[icon] || DollarSign;
 
   return (
     <Link href={href} data-testid={`category-${id}`}>
@@ -18,7 +26,7 @@ export default function CategoryCard({ id, name, description, icon, color, href 
         <Card className="category-card rounded-2xl p-6 group cursor-pointer">
           <div className="flex items-center justify-between mb-4">
             <div className={`w-12 h-12 ${iconColorClass} rounded-xl flex items-center justify-center`}>
-              <i className={`${icon} text-xl`} />
+              <IconComponent className="h-6 w-6" />
             </div>
             <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
           </div>

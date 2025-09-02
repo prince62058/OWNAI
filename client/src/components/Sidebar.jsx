@@ -29,6 +29,7 @@ import {
   Infinity,
   DollarSign,
   Plane,
+  ShoppingBag,
   GraduationCap
 } from "lucide-react";
 
@@ -52,6 +53,7 @@ function SidebarComponent() {
   const categories = [
     { label: "Finance", href: "/finance", icon: DollarSign },
     { label: "Travel", href: "/travel", icon: Plane },
+    { label: "Shopping", href: "/shopping", icon: ShoppingBag },
     { label: "Academic", href: "/academic", icon: GraduationCap },
   ];
 

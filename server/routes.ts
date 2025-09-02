@@ -151,7 +151,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           id: 'finance',
           name: 'Finance',
           description: 'Get insights on markets, investments, and financial planning',
-          icon: 'fas fa-chart-line',
+          icon: 'DollarSign',
           color: 'green',
           href: '/finance'
         },
@@ -159,7 +159,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           id: 'travel',
           name: 'Travel',
           description: 'Discover destinations, plan trips, and travel tips',
-          icon: 'fas fa-plane',
+          icon: 'Plane',
           color: 'blue',
           href: '/travel'
         },
@@ -167,7 +167,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           id: 'shopping',
           name: 'Shopping',
           description: 'Find products, compare prices, and shopping advice',
-          icon: 'fas fa-shopping-bag',
+          icon: 'ShoppingBag',
           color: 'purple',
           href: '/shopping'
         },
@@ -175,7 +175,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           id: 'academic',
           name: 'Academic',
           description: 'Research assistance and educational content',
-          icon: 'fas fa-graduation-cap',
+          icon: 'GraduationCap',
           color: 'orange',
           href: '/academic'
         }
