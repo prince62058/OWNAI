@@ -225,8 +225,8 @@ export default function Landing() {
                     onClick={() => window.location.href = "/api/login"}
                     data-testid="signin-email"
                   >
-                    <div className="w-6 h-6 bg-primary/20 rounded-lg flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
-                      <i className="fas fa-envelope text-primary text-sm" />
+                    <div className="w-6 h-6 bg-white rounded-lg flex items-center justify-center mr-4 group-hover:scale-110 transition-transform p-1">
+                      <img src="/email-icon.png" alt="Email" className="w-full h-full object-contain" />
                     </div>
                     <span className="font-medium">Email address</span>
                   </Button>
