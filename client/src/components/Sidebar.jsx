@@ -64,15 +64,15 @@ function SidebarComponent() {
             <div className="flex items-center justify-between w-full">
               <SidebarMenuButton size="lg" asChild>
                 <Link href="/" data-testid="sidebar-logo">
-                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
+                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg flex-shrink-0">
                     <img src="/ft-logo.png" alt="FrienchTech.Ai" className="size-8 rounded-lg object-contain" />
                   </div>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
+                  <div className="grid flex-1 text-left text-sm leading-tight min-w-0">
                     <span className="truncate font-semibold">FrienchTech.Ai</span>
                   </div>
                 </Link>
               </SidebarMenuButton>
-              <SidebarTrigger className="text-left" />
+              <SidebarTrigger className="text-left flex-shrink-0" />
             </div>
           </SidebarMenuItem>
         </SidebarMenu>
