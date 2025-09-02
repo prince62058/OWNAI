@@ -1,0 +1,804 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perplexity AI Clone - Ask Anything</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+        darkMode: 'class',
+        theme: {
+            extend: {
+                borderRadius: {
+                    lg: "var(--radius)",
+                    md: "calc(var(--radius) - 2px)",
+                    sm: "calc(var(--radius) - 4px)",
+                },
+                colors: {
+                    background: "var(--background)",
+                    foreground: "var(--foreground)",
+                    card: {
+                        DEFAULT: "var(--card)",
+                        foreground: "var(--card-foreground)",
+                    },
+                    popover: {
+                        DEFAULT: "var(--popover)",
+                        foreground: "var(--popover-foreground)",
+                    },
+                    primary: {
+                        DEFAULT: "var(--primary)",
+                        foreground: "var(--primary-foreground)",
+                    },
+                    secondary: {
+                        DEFAULT: "var(--secondary)",
+                        foreground: "var(--secondary-foreground)",
+                    },
+                    muted: {
+                        DEFAULT: "var(--muted)",
+                        foreground: "var(--muted-foreground)",
+                    },
+                    accent: {
+                        DEFAULT: "var(--accent)",
+                        foreground: "var(--accent-foreground)",
+                    },
+                    destructive: {
+                        DEFAULT: "var(--destructive)",
+                        foreground: "var(--destructive-foreground)",
+                    },
+                    border: "var(--border)",
+                    input: "var(--input)",
+                    ring: "var(--ring)"
+                },
+                fontFamily: {
+                    sans: ["Inter", "system-ui", "sans-serif"],
+                }
+            },
+        }
+    };
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --background: hsl(0 0% 100%);
+            --foreground: hsl(222 10% 15%);
+            --card: hsl(0 0% 100%);
+            --card-foreground: hsl(222 10% 15%);
+            --popover: hsl(0 0% 100%);
+            --popover-foreground: hsl(222 10% 15%);
+            --primary: hsl(262 83% 58%);
+            --primary-foreground: hsl(0 0% 100%);
+            --secondary: hsl(210 40% 98%);
+            --secondary-foreground: hsl(222 10% 15%);
+            --muted: hsl(210 40% 96%);
+            --muted-foreground: hsl(215 10% 40%);
+            --accent: hsl(210 40% 96%);
+            --accent-foreground: hsl(222 10% 15%);
+            --destructive: hsl(0 84% 60%);
+            --destructive-foreground: hsl(0 0% 100%);
+            --border: hsl(214 32% 91%);
+            --input: hsl(214 32% 91%);
+            --ring: hsl(262 83% 58%);
+            --radius: 0.75rem;
+        }
+
+        .dark {
+            --background: hsl(222 15% 7%);
+            --foreground: hsl(210 40% 98%);
+            --card: hsl(222 15% 10%);
+            --card-foreground: hsl(210 40% 98%);
+            --popover: hsl(222 15% 10%);
+            --popover-foreground: hsl(210 40% 98%);
+            --primary: hsl(262 83% 58%);
+            --primary-foreground: hsl(0 0% 100%);
+            --secondary: hsl(217 33% 17%);
+            --secondary-foreground: hsl(210 40% 98%);
+            --muted: hsl(217 33% 17%);
+            --muted-foreground: hsl(215 20% 65%);
+            --accent: hsl(217 33% 17%);
+            --accent-foreground: hsl(210 40% 98%);
+            --destructive: hsl(0 62% 30%);
+            --destructive-foreground: hsl(0 0% 100%);
+            --border: hsl(217 33% 17%);
+            --input: hsl(217 33% 17%);
+            --ring: hsl(262 83% 58%);
+        }
+
+        * {
+            border-color: hsl(var(--border));
+        }
+
+        body {
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, hsl(var(--primary)), hsl(262 83% 70%));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .search-input {
+            background: hsl(var(--card));
+            border: 2px solid hsl(var(--border));
+            transition: all 0.2s ease;
+        }
+
+        .search-input:focus {
+            border-color: hsl(var(--primary));
+            box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
+        }
+
+        .category-card {
+            background: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+            transition: all 0.3s ease;
+        }
+
+        .category-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px hsl(var(--foreground) / 0.1);
+            border-color: hsl(var(--primary));
+        }
+
+        .nav-link {
+            color: hsl(var(--muted-foreground));
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: hsl(var(--foreground));
+        }
+
+        .discover-card {
+            background: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+            transition: all 0.2s ease;
+        }
+
+        .discover-card:hover {
+            border-color: hsl(var(--primary));
+            box-shadow: 0 4px 12px hsl(var(--foreground) / 0.1);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .floating-action {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 50;
+        }
+
+        @media (max-width: 768px) {
+            .floating-action {
+                bottom: 1rem;
+                right: 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-background text-foreground">
+    <!-- @COMPONENT: Header [navigation and theme toggle] -->
+    <header class="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex h-16 items-center justify-between">
+                <div class="flex items-center space-x-8">
+                    <!-- Logo -->
+                    <a href="/" class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                            <i class="fas fa-infinity text-primary-foreground text-lg"></i>
+                        </div>
+                        <span class="text-xl font-bold gradient-text">Perplexity</span>
+                    </a>
+
+                    <!-- Navigation -->
+                    <nav class="hidden md:flex items-center space-x-6">
+                        <a href="/" class="nav-link active text-sm font-medium">Home</a>
+                        <a href="/discover" class="nav-link text-sm font-medium">Discover</a>
+                        <a href="/spaces" class="nav-link text-sm font-medium">Spaces</a>
+                        <a href="/library" class="nav-link text-sm font-medium">Library</a>
+                    </nav>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <!-- Theme Toggle -->
+                    <button id="theme-toggle" class="p-2 rounded-lg hover:bg-accent transition-colors">
+                        <i class="fas fa-moon text-muted-foreground"></i>
+                    </button>
+
+                    <!-- User Menu -->
+                    <div class="hidden sm:flex items-center space-x-3">
+                        <button class="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                            Sign In
+                        </button>
+                        <button class="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">
+                            Get Pro
+                        </button>
+                    </div>
+
+                    <!-- Mobile Menu Toggle -->
+                    <button class="md:hidden p-2 rounded-lg hover:bg-accent transition-colors">
+                        <i class="fas fa-bars text-muted-foreground"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- @END_COMPONENT: Header -->
+
+    <!-- @COMPONENT: MainContent [search interface and category navigation] -->
+    <main class="flex-1">
+        <!-- Hero Section with Search -->
+        <section class="py-20 px-4 sm:px-6 lg:px-8">
+            <div class="container mx-auto max-w-4xl text-center">
+                <div class="fade-in">
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+                        Where knowledge begins
+                    </h1>
+                    <p class="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto">
+                        Ask anything and get instant, accurate answers with cited sources. 
+                        Powered by advanced AI and real-time web search.
+                    </p>
+
+                    <!-- Search Interface -->
+                    <div class="relative max-w-2xl mx-auto mb-8">
+                        <div class="relative">
+                            <input 
+                                type="text" 
+                                placeholder="Ask anything..."
+                                class="search-input w-full px-6 py-4 pr-14 rounded-2xl text-lg focus:outline-none resize-none"
+                                data-bind="searchQuery"
+                                data-event="input:handleSearchInput,keydown:handleKeyDown"
+                                data-implementation="Should trigger search suggestions on input"
+                            />
+                            <button class="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 transition-colors"
+                                    data-event="click:handleSearch"
+                                    data-implementation="Should initiate AI search">
+                                <i class="fas fa-arrow-up text-sm"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Search Suggestions (hidden by default) -->
+                        <div class="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-xl shadow-lg z-10 hidden"
+                             data-implementation="Show/hide based on search input and suggestions available">
+                            <div class="p-2">
+                                <div class="px-3 py-2 hover:bg-accent rounded-lg cursor-pointer text-left text-sm">
+                                    What are the latest AI developments?
+                                </div>
+                                <div class="px-3 py-2 hover:bg-accent rounded-lg cursor-pointer text-left text-sm">
+                                    How does machine learning work?
+                                </div>
+                                <div class="px-3 py-2 hover:bg-accent rounded-lg cursor-pointer text-left text-sm">
+                                    Best practices for web development
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="flex flex-wrap justify-center gap-3 mb-12">
+                        <button class="px-4 py-2 bg-secondary text-secondary-foreground rounded-full text-sm font-medium hover:bg-secondary/80 transition-colors">
+                            <i class="fas fa-family mr-2"></i>Parenting
+                        </button>
+                        <button class="px-4 py-2 bg-secondary text-secondary-foreground rounded-full text-sm font-medium hover:bg-secondary/80 transition-colors">
+                            <i class="fas fa-balance-scale mr-2"></i>Compare
+                        </button>
+                        <button class="px-4 py-2 bg-secondary text-secondary-foreground rounded-full text-sm font-medium hover:bg-secondary/80 transition-colors">
+                            <i class="fas fa-check-circle mr-2"></i>Fact Check
+                        </button>
+                        <button class="px-4 py-2 bg-secondary text-secondary-foreground rounded-full text-sm font-medium hover:bg-secondary/80 transition-colors">
+                            <i class="fas fa-chart-line mr-2"></i>Analyze
+                        </button>
+                        <button class="px-4 py-2 bg-secondary text-secondary-foreground rounded-full text-sm font-medium hover:bg-secondary/80 transition-colors">
+                            <i class="fas fa-football-ball mr-2"></i>Sports
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Category Navigation -->
+        <section class="py-16 px-4 sm:px-6 lg:px-8 bg-muted/30">
+            <div class="container mx-auto max-w-6xl">
+                <h2 class="text-2xl font-semibold mb-8 text-center">Explore by Category</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Finance Category -->
+                    <a href="/finance" class="category-card rounded-2xl p-6 block group">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-chart-line text-green-600 dark:text-green-400 text-xl"></i>
+                            </div>
+                            <i class="fas fa-arrow-right text-muted-foreground group-hover:text-primary transition-colors"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-2">Finance</h3>
+                        <p class="text-muted-foreground text-sm">Get insights on markets, investments, and financial planning</p>
+                    </a>
+
+                    <!-- Travel Category -->
+                    <a href="/travel" class="category-card rounded-2xl p-6 block group">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-plane text-blue-600 dark:text-blue-400 text-xl"></i>
+                            </div>
+                            <i class="fas fa-arrow-right text-muted-foreground group-hover:text-primary transition-colors"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-2">Travel</h3>
+                        <p class="text-muted-foreground text-sm">Discover destinations, plan trips, and travel tips</p>
+                    </a>
+
+                    <!-- Shopping Category -->
+                    <a href="/shopping" class="category-card rounded-2xl p-6 block group">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-shopping-bag text-purple-600 dark:text-purple-400 text-xl"></i>
+                            </div>
+                            <i class="fas fa-arrow-right text-muted-foreground group-hover:text-primary transition-colors"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-2">Shopping</h3>
+                        <p class="text-muted-foreground text-sm">Find products, compare prices, and shopping advice</p>
+                    </a>
+
+                    <!-- Academic Category -->
+                    <a href="/academic" class="category-card rounded-2xl p-6 block group">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-graduation-cap text-orange-600 dark:text-orange-400 text-xl"></i>
+                            </div>
+                            <i class="fas fa-arrow-right text-muted-foreground group-hover:text-primary transition-colors"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-2">Academic</h3>
+                        <p class="text-muted-foreground text-sm">Research assistance and educational content</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Discover Section -->
+        <section class="py-16 px-4 sm:px-6 lg:px-8">
+            <div class="container mx-auto max-w-6xl">
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-2xl font-semibold">Trending Now</h2>
+                    <a href="/discover" class="text-primary hover:text-primary/80 font-medium">View all</a>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- @MAP: trendingTopics.map(topic => ( -->
+                    <div class="discover-card rounded-xl p-6 cursor-pointer"
+                         data-event="click:handleTopicClick"
+                         data-implementation="Should navigate to search results for this topic">
+                        <div class="flex items-start space-x-3 mb-4">
+                            <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-fire text-primary text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold mb-1" data-bind="topic.title">Latest AI Breakthroughs in 2024</h3>
+                                <p class="text-muted-foreground text-sm" data-bind="topic.description">Discover the most significant AI developments this year</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between text-xs text-muted-foreground">
+                            <span data-bind="topic.category">Technology</span>
+                            <span data-bind="topic.readTime">2 min read</span>
+                        </div>
+                    </div>
+
+                    <div class="discover-card rounded-xl p-6 cursor-pointer">
+                        <div class="flex items-start space-x-3 mb-4">
+                            <div class="w-8 h-8 bg-green-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-leaf text-green-500 text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold mb-1">Sustainable Investment Strategies</h3>
+                                <p class="text-muted-foreground text-sm">How to build an eco-friendly investment portfolio</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between text-xs text-muted-foreground">
+                            <span>Finance</span>
+                            <span>4 min read</span>
+                        </div>
+                    </div>
+
+                    <div class="discover-card rounded-xl p-6 cursor-pointer">
+                        <div class="flex items-start space-x-3 mb-4">
+                            <div class="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-map-marked-alt text-blue-500 text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold mb-1">Hidden Gems in Southeast Asia</h3>
+                                <p class="text-muted-foreground text-sm">Off-the-beaten-path destinations for adventurous travelers</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between text-xs text-muted-foreground">
+                            <span>Travel</span>
+                            <span>6 min read</span>
+                        </div>
+                    </div>
+
+                    <div class="discover-card rounded-xl p-6 cursor-pointer">
+                        <div class="flex items-start space-x-3 mb-4">
+                            <div class="w-8 h-8 bg-purple-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-graduation-cap text-purple-500 text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold mb-1">Quantum Computing Fundamentals</h3>
+                                <p class="text-muted-foreground text-sm">Understanding the basics of quantum computation</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between text-xs text-muted-foreground">
+                            <span>Academic</span>
+                            <span>8 min read</span>
+                        </div>
+                    </div>
+
+                    <div class="discover-card rounded-xl p-6 cursor-pointer">
+                        <div class="flex items-start space-x-3 mb-4">
+                            <div class="w-8 h-8 bg-orange-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-shopping-cart text-orange-500 text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold mb-1">Best Tech Deals This Week</h3>
+                                <p class="text-muted-foreground text-sm">Top technology products with significant discounts</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between text-xs text-muted-foreground">
+                            <span>Shopping</span>
+                            <span>3 min read</span>
+                        </div>
+                    </div>
+
+                    <div class="discover-card rounded-xl p-6 cursor-pointer">
+                        <div class="flex items-start space-x-3 mb-4">
+                            <div class="w-8 h-8 bg-red-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-heartbeat text-red-500 text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold mb-1">Mental Health in Remote Work</h3>
+                                <p class="text-muted-foreground text-sm">Strategies for maintaining wellbeing while working from home</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between text-xs text-muted-foreground">
+                            <span>Health</span>
+                            <span>5 min read</span>
+                        </div>
+                    </div>
+                    <!-- @END_MAP -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Spaces/Templates Section -->
+        <section class="py-16 px-4 sm:px-6 lg:px-8 bg-muted/30">
+            <div class="container mx-auto max-w-6xl">
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h2 class="text-2xl font-semibold mb-2">Spaces & Templates</h2>
+                        <p class="text-muted-foreground">Organized collections for specific topics and workflows</p>
+                    </div>
+                    <a href="/spaces" class="text-primary hover:text-primary/80 font-medium">Browse all</a>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="category-card rounded-xl p-6 group cursor-pointer">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-briefcase text-white text-sm"></i>
+                            </div>
+                            <span class="text-xs text-muted-foreground">12 templates</span>
+                        </div>
+                        <h3 class="font-semibold mb-2">Business Strategy</h3>
+                        <p class="text-muted-foreground text-sm mb-4">Market analysis, competitive research, and business planning</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-2 py-1 bg-secondary rounded text-xs">SWOT Analysis</span>
+                            <span class="px-2 py-1 bg-secondary rounded text-xs">Market Research</span>
+                        </div>
+                    </div>
+
+                    <div class="category-card rounded-xl p-6 group cursor-pointer">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-teal-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-code text-white text-sm"></i>
+                            </div>
+                            <span class="text-xs text-muted-foreground">8 templates</span>
+                        </div>
+                        <h3 class="font-semibold mb-2">Developer Tools</h3>
+                        <p class="text-muted-foreground text-sm mb-4">Code review, debugging, and technical documentation</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-2 py-1 bg-secondary rounded text-xs">Code Review</span>
+                            <span class="px-2 py-1 bg-secondary rounded text-xs">Documentation</span>
+                        </div>
+                    </div>
+
+                    <div class="category-card rounded-xl p-6 group cursor-pointer">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-pen-fancy text-white text-sm"></i>
+                            </div>
+                            <span class="text-xs text-muted-foreground">15 templates</span>
+                        </div>
+                        <h3 class="font-semibold mb-2">Creative Writing</h3>
+                        <p class="text-muted-foreground text-sm mb-4">Content creation, storytelling, and copywriting assistance</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-2 py-1 bg-secondary rounded text-xs">Blog Posts</span>
+                            <span class="px-2 py-1 bg-secondary rounded text-xs">Marketing Copy</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recent Activity / Library Preview -->
+        <section class="py-16 px-4 sm:px-6 lg:px-8">
+            <div class="container mx-auto max-w-4xl">
+                <div class="text-center mb-12">
+                    <h2 class="text-2xl font-semibold mb-4">Your Library</h2>
+                    <p class="text-muted-foreground mb-8">Access your search history, saved threads, and collections</p>
+                    
+                    <!-- Sign-in Prompt -->
+                    <div class="bg-card border border-border rounded-2xl p-8 max-w-md mx-auto">
+                        <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-user text-primary text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-2">Sign in or create an account</h3>
+                        <p class="text-muted-foreground text-sm mb-6">Unlock Pro Search and History</p>
+                        
+                        <div class="space-y-3">
+                            <button class="w-full flex items-center justify-center space-x-3 px-4 py-3 border border-border rounded-lg hover:bg-accent transition-colors"
+                                    data-event="click:signInWithGoogle"
+                                    data-implementation="Should handle Google OAuth">
+                                <i class="fab fa-google text-lg"></i>
+                                <span>Continue with Google</span>
+                            </button>
+                            
+                            <button class="w-full flex items-center justify-center space-x-3 px-4 py-3 border border-border rounded-lg hover:bg-accent transition-colors"
+                                    data-event="click:signInWithApple"
+                                    data-implementation="Should handle Apple Sign In">
+                                <i class="fab fa-apple text-lg"></i>
+                                <span>Continue with Apple</span>
+                            </button>
+                            
+                            <button class="w-full flex items-center justify-center space-x-3 px-4 py-3 border border-border rounded-lg hover:bg-accent transition-colors"
+                                    data-event="click:signInWithEmail"
+                                    data-implementation="Should show email sign in form">
+                                <i class="fas fa-envelope text-lg"></i>
+                                <span>Continue with email</span>
+                            </button>
+                            
+                            <div class="pt-2">
+                                <button class="text-primary hover:text-primary/80 text-sm font-medium"
+                                        data-event="click:ssoSignIn"
+                                        data-implementation="Should handle SSO authentication">
+                                    Single sign-on (SSO)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- @END_COMPONENT: MainContent -->
+
+    <!-- @COMPONENT: Footer [links and additional navigation] -->
+    <footer class="border-t border-border bg-muted/30 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="container mx-auto max-w-6xl">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="md:col-span-2">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-6 h-6 bg-primary rounded-lg flex items-center justify-center">
+                            <i class="fas fa-infinity text-primary-foreground text-xs"></i>
+                        </div>
+                        <span class="text-lg font-bold gradient-text">Perplexity</span>
+                    </div>
+                    <p class="text-muted-foreground text-sm max-w-md">
+                        The AI-powered search engine that provides accurate, real-time answers with cited sources.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">Product</h4>
+                    <ul class="space-y-2 text-sm text-muted-foreground">
+                        <li><a href="/pro" class="hover:text-foreground transition-colors">Perplexity Pro</a></li>
+                        <li><a href="/enterprise" class="hover:text-foreground transition-colors">Enterprise</a></li>
+                        <li><a href="/api" class="hover:text-foreground transition-colors">API</a></li>
+                        <li><a href="/mobile" class="hover:text-foreground transition-colors">Mobile App</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">Company</h4>
+                    <ul class="space-y-2 text-sm text-muted-foreground">
+                        <li><a href="/about" class="hover:text-foreground transition-colors">About</a></li>
+                        <li><a href="/careers" class="hover:text-foreground transition-colors">Careers</a></li>
+                        <li><a href="/blog" class="hover:text-foreground transition-colors">Blog</a></li>
+                        <li><a href="/contact" class="hover:text-foreground transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+                <p class="text-xs text-muted-foreground">
+                    © 2024 Perplexity AI. All rights reserved.
+                </p>
+                <div class="flex items-center space-x-6 text-xs text-muted-foreground">
+                    <a href="/privacy" class="hover:text-foreground transition-colors">Privacy Policy</a>
+                    <a href="/terms" class="hover:text-foreground transition-colors">Terms of Service</a>
+                    <a href="/cookies" class="hover:text-foreground transition-colors">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- @END_COMPONENT: Footer -->
+
+    <!-- @COMPONENT: FloatingActions [create thread and scroll to top] -->
+    <div class="floating-action">
+        <button class="w-14 h-14 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 transition-all hover:scale-105"
+                data-event="click:createNewThread"
+                data-implementation="Should open new thread creation interface"
+                title="Create a Thread">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+    <!-- @END_COMPONENT: FloatingActions -->
+
+    <!-- @COMPONENT: MobileNavigation [bottom navigation for mobile] -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border z-40">
+        <div class="flex items-center justify-around py-2">
+            <a href="/" class="flex flex-col items-center py-2 px-3 text-primary">
+                <i class="fas fa-home text-lg mb-1"></i>
+                <span class="text-xs font-medium">Home</span>
+            </a>
+            <a href="/discover" class="flex flex-col items-center py-2 px-3 text-muted-foreground">
+                <i class="fas fa-compass text-lg mb-1"></i>
+                <span class="text-xs">Discover</span>
+            </a>
+            <a href="/spaces" class="flex flex-col items-center py-2 px-3 text-muted-foreground">
+                <i class="fas fa-th-large text-lg mb-1"></i>
+                <span class="text-xs">Spaces</span>
+            </a>
+            <a href="/library" class="flex flex-col items-center py-2 px-3 text-muted-foreground">
+                <i class="fas fa-bookmark text-lg mb-1"></i>
+                <span class="text-xs">Library</span>
+            </a>
+        </div>
+    </nav>
+    <!-- @END_COMPONENT: MobileNavigation -->
+
+    <script>
+        (function() {
+            // Theme toggle functionality
+            const themeToggle = document.getElementById('theme-toggle');
+            const html = document.documentElement;
+            
+            // Check for saved theme preference or default to light mode
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                html.classList.add('dark');
+                themeToggle.innerHTML = '<i class="fas fa-sun text-muted-foreground"></i>';
+            }
+            
+            themeToggle.addEventListener('click', () => {
+                html.classList.toggle('dark');
+                const isDark = html.classList.contains('dark');
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                themeToggle.innerHTML = isDark ? 
+                    '<i class="fas fa-sun text-muted-foreground"></i>' : 
+                    '<i class="fas fa-moon text-muted-foreground"></i>';
+            });
+
+            // Search input focus handling
+            const searchInput = document.querySelector('.search-input');
+            const suggestionsPanel = document.querySelector('[data-implementation*="Show/hide based on search input"]');
+            
+            searchInput.addEventListener('focus', () => {
+                // TODO: Show search suggestions
+                console.log('Search input focused - show suggestions');
+            });
+            
+            searchInput.addEventListener('blur', (e) => {
+                // TODO: Hide suggestions after delay to allow for clicks
+                setTimeout(() => {
+                    console.log('Search input blurred - hide suggestions');
+                }, 150);
+            });
+            
+            searchInput.addEventListener('input', (e) => {
+                // TODO: Fetch and display search suggestions
+                console.log('Search input changed:', e.target.value);
+            });
+
+            // Category card click handling
+            document.querySelectorAll('.category-card').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    // TODO: Navigate to category page or trigger category search
+                    console.log('Category clicked:', card.getAttribute('href'));
+                });
+            });
+
+            // Discover card click handling
+            document.querySelectorAll('.discover-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    // TODO: Navigate to topic discussion or search results
+                    console.log('Discover topic clicked');
+                });
+            });
+
+            // Floating action button
+            document.querySelector('.floating-action button').addEventListener('click', () => {
+                // TODO: Open new thread creation interface
+                console.log('Create new thread clicked');
+            });
+
+            // Mobile navigation
+            document.querySelectorAll('nav a').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    // Remove active class from all links
+                    document.querySelectorAll('nav a').forEach(l => l.classList.remove('text-primary'));
+                    // Add active class to clicked link
+                    link.classList.add('text-primary');
+                });
+            });
+
+            // Search form submission
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && document.activeElement === searchInput) {
+                    e.preventDefault();
+                    // TODO: Handle search submission
+                    console.log('Search submitted:', searchInput.value);
+                }
+            });
+
+            // Authentication buttons
+            document.querySelectorAll('[data-event*="signIn"]').forEach(button => {
+                button.addEventListener('click', () => {
+                    // TODO: Handle authentication flow
+                    console.log('Authentication initiated:', button.textContent);
+                });
+            });
+
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            // Add fade-in animation to elements as they come into view
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in');
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all cards and sections
+            document.querySelectorAll('.category-card, .discover-card, section').forEach(el => {
+                observer.observe(el);
+            });
+        })();
+    </script>
+</body>
+</html>
