@@ -192,8 +192,8 @@ export default function Landing() {
                     onClick={() => window.location.href = "/api/login"}
                     data-testid="signin-google"
                   >
-                    <div className="w-6 h-6 bg-white rounded-lg flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
-                      <i className="fab fa-google text-red-500 text-sm" />
+                    <div className="w-6 h-6 bg-white rounded-lg flex items-center justify-center mr-4 group-hover:scale-110 transition-transform p-1">
+                      <img src="/google-logo.png" alt="Google" className="w-full h-full object-contain" />
                     </div>
                     <span className="font-medium">Continue with Google</span>
                   </Button>
