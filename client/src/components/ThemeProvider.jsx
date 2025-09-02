@@ -10,30 +10,21 @@ const ThemeProviderContext = createContext(initialState);
 
 export function ThemeProvider({
   children,
-  defaultTheme = "dark",
   ...props
 }) {
-  const [theme, setTheme] = useState(
-    () => (localStorage.getItem("theme")) || defaultTheme
-  );
+  const theme = "dark";
 
   useEffect(() => {
     const root = window.document.documentElement;
     root.classList.remove("light", "dark");
-    root.classList.add(theme);
-  }, [theme]);
+    root.classList.add("dark");
+    localStorage.setItem("theme", "dark");
+  }, []);
 
   const value = {
     theme,
-    setTheme: (theme) => {
-      localStorage.setItem("theme", theme);
-      setTheme(theme);
-    },
-    toggleTheme: () => {
-      const newTheme = theme === "light" ? "dark" : "light";
-      localStorage.setItem("theme", newTheme);
-      setTheme(newTheme);
-    },
+    setTheme: () => {}, // No-op function
+    toggleTheme: () => {}, // No-op function
   };
 
   return (

@@ -1,12 +1,10 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { useTheme } from "@/components/ThemeProvider";
 import { useAuth } from "@/hooks/useAuth";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Moon, Sun, Infinity } from "lucide-react";
+import { Menu, Infinity } from "lucide-react";
 
 export default function Header() {
-  const { theme, toggleTheme } = useTheme();
   const { isAuthenticated, user } = useAuth();
   const [location] = useLocation();
 
@@ -54,20 +52,6 @@ export default function Header() {
           </div>
 
           <div className="flex items-center space-x-4">
-            {/* Theme Toggle */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleTheme}
-              data-testid="theme-toggle"
-            >
-              {theme === "dark" ? (
-                <Sun className="h-5 w-5" />
-              ) : (
-                <Moon className="h-5 w-5" />
-              )}
-            </Button>
-
             {/* User Menu */}
             <div className="hidden sm:flex items-center space-x-3">
               {isAuthenticated ? (
