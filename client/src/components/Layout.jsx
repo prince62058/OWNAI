@@ -4,21 +4,21 @@ import MobileNav from "@/components/MobileNav";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 
 export default function Layout({ children }) {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   return (
     <SidebarProvider>
-      <div className="flex h-screen bg-background">
+      <div className="flex h-screen w-full bg-background">
         {/* Desktop Sidebar */}
         <div className="hidden md:flex">
           <Sidebar />
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <SidebarInset className="flex-1 flex flex-col overflow-hidden">
           {/* Mobile Header with Menu Button */}
           <div className="md:hidden flex items-center justify-between p-4 border-b border-border bg-card">
             <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
@@ -45,7 +45,7 @@ export default function Layout({ children }) {
           <main className="flex-1 overflow-y-auto">
             {children}
           </main>
-        </div>
+        </SidebarInset>
 
         {/* Mobile Navigation */}
         <MobileNav />

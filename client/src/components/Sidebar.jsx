@@ -198,10 +198,4 @@ function SidebarComponent() {
   );
 }
 
-export default function SidebarWrapper() {
-  return (
-    <SidebarProvider>
-      <SidebarComponent />
-    </SidebarProvider>
-  );
-}
+export default SidebarComponent;
