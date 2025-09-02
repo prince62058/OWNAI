@@ -62,12 +62,12 @@ function SidebarComponent() {
         <SidebarMenu>
           <SidebarMenuItem>
             <div className="flex items-center justify-between w-full">
-              <SidebarMenuButton size="lg" asChild>
+              <SidebarMenuButton size="lg" asChild className="[&>*:first-child]:!block">
                 <Link href="/" data-testid="sidebar-logo">
                   <div className="flex aspect-square size-8 items-center justify-center rounded-lg flex-shrink-0">
                     <img src="/ft-logo.png" alt="FrienchTech.Ai" className="size-8 rounded-lg object-contain" />
                   </div>
-                  <div className="grid flex-1 text-left text-sm leading-tight min-w-0">
+                  <div className="grid flex-1 text-left text-sm leading-tight min-w-0 group-data-[collapsible=icon]:hidden">
                     <span className="truncate font-semibold">FrienchTech.Ai</span>
                   </div>
                 </Link>
