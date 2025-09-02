@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import Header from "@/components/Header";
-import MobileNav from "@/components/MobileNav";
+import Layout from "@/components/Layout";
 import TrendingCard from "@/components/TrendingCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -39,8 +38,7 @@ export default function Discover() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <Header />
+    <Layout>
       
       <main className="flex-1 pb-20 md:pb-0">
         {/* Hero Section */}
@@ -137,8 +135,6 @@ export default function Discover() {
           </div>
         </section>
       </main>
-
-      <MobileNav />
-    </div>
+    </Layout>
   );
 }

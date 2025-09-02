@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import Header from "@/components/Header";
-import MobileNav from "@/components/MobileNav";
+import Layout from "@/components/Layout";
 import SearchInterface from "@/components/SearchInterface";
 import CategoryCard from "@/components/CategoryCard";
 import TrendingCard from "@/components/TrendingCard";
@@ -42,8 +41,7 @@ export default function Landing() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <Header />
+    <Layout>
       
       <main className="flex-1 pb-20 md:pb-0">
         {/* Hero Section with Search */}
@@ -229,8 +227,6 @@ export default function Landing() {
       >
         <Plus className="h-6 w-6" />
       </Button>
-
-      <MobileNav />
-    </div>
+    </Layout>
   );
 }

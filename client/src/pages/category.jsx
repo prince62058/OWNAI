@@ -1,7 +1,6 @@
 import { useParams, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import Header from "@/components/Header";
-import MobileNav from "@/components/MobileNav";
+import Layout from "@/components/Layout";
 import SearchInterface from "@/components/SearchInterface";
 import TrendingCard from "@/components/TrendingCard";
 import { Card } from "@/components/ui/card";
@@ -36,14 +35,12 @@ export default function Category() {
 
   if (!currentCategory) {
     return (
-      <div className="min-h-screen bg-background">
-        <Header />
+      <Layout>
         <div className="container mx-auto px-4 py-12 text-center">
           <h1 className="text-2xl font-bold mb-4">Category Not Found</h1>
           <p className="text-muted-foreground">The category you're looking for doesn't exist.</p>
         </div>
-        <MobileNav />
-      </div>
+      </Layout>
     );
   }
 
@@ -55,8 +52,7 @@ export default function Category() {
   }[currentCategory.color] || "bg-primary/10 text-primary";
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <Header />
+    <Layout>
       
       <main className="flex-1 pb-20 md:pb-0">
         {/* Category Hero */}
@@ -160,8 +156,6 @@ export default function Category() {
           </div>
         </section>
       </main>
-
-      <MobileNav />
-    </div>
+    </Layout>
   );
 }

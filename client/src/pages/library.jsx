@@ -3,8 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
-import Header from "@/components/Header";
-import MobileNav from "@/components/MobileNav";
+import Layout from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -52,12 +51,11 @@ export default function Library() {
 
   if (authLoading || !isAuthenticated) {
     return (
-      <div className="min-h-screen bg-background">
-        <Header />
+      <Layout>
         <div className="flex items-center justify-center h-96">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
-      </div>
+      </Layout>
     );
   }
 
@@ -73,8 +71,7 @@ export default function Library() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <Header />
+    <Layout>
       
       <main className="flex-1 pb-20 md:pb-0">
         {/* Hero Section */}
@@ -196,8 +193,6 @@ export default function Library() {
           </div>
         </section>
       </main>
-
-      <MobileNav />
-    </div>
+    </Layout>
   );
 }

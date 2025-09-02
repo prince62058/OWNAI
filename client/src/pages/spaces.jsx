@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import Header from "@/components/Header";
-import MobileNav from "@/components/MobileNav";
+import Layout from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -31,8 +30,7 @@ export default function Spaces() {
   });
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <Header />
+    <Layout>
       
       <main className="flex-1 pb-20 md:pb-0">
         {/* Hero Section */}
@@ -143,8 +141,6 @@ export default function Spaces() {
           </div>
         </section>
       </main>
-
-      <MobileNav />
-    </div>
+    </Layout>
   );
 }
