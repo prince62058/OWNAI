@@ -1,7 +1,6 @@
 
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
-import { useTheme } from "@/components/ThemeProvider";
 import { Button } from "@/components/ui/button";
 import {
   Sidebar,
@@ -24,8 +23,6 @@ import {
   Grid3X3, 
   Bookmark, 
   Plus, 
-  Moon, 
-  Sun, 
   Infinity,
   DollarSign,
   Plane,
@@ -36,7 +33,6 @@ import {
 function SidebarComponent() {
   const [location] = useLocation();
   const { isAuthenticated, user } = useAuth();
-  const { theme, toggleTheme } = useTheme();
 
   const isActive = (href) => {
     if (href === "/") return location === "/";
