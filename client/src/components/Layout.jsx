@@ -33,10 +33,10 @@ export default function Layout({ children }) {
             </Sheet>
 
             <div className="flex items-center space-x-2">
-              <div className="w-6 h-6 bg-primary rounded-md flex items-center justify-center">
-                <span className="text-primary-foreground text-xs font-bold">∞</span>
+              <div className="w-6 h-6 rounded-md flex items-center justify-center">
+                <img src="/logo.png" alt="FrienchTech.Ai" className="w-6 h-6 rounded-md" />
               </div>
-              <span className="text-lg font-bold">perplexity</span>
+              <span className="text-lg font-bold">FrienchTech.Ai</span>
             </div>
 
             <div className="w-10"></div> {/* Spacer for centering */}

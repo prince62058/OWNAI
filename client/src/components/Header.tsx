@@ -30,10 +30,10 @@ export default function Header() {
             {/* Logo */}
             <Link href="/" data-testid="logo-link">
               <a className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <Infinity className="text-primary-foreground w-5 h-5" />
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center">
+                  <img src="/logo.png" alt="FrienchTech.Ai" className="w-8 h-8 rounded-lg" />
                 </div>
-                <span className="text-xl font-bold gradient-text">Perplexity</span>
+                <span className="text-xl font-bold gradient-text">FrienchTech.Ai</span>
               </a>
             </Link>
 
