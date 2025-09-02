@@ -31,7 +31,7 @@ export default function Header() {
             <Link href="/" data-testid="logo-link">
               <a className="flex items-center space-x-2">
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center">
-                  <img src="/logo.png" alt="FrienchTech.Ai" className="w-8 h-8 rounded-lg" />
+                  <img src="/ft-logo.png" alt="FrienchTech.Ai" className="w-8 h-8 rounded-lg object-contain" />
                 </div>
                 <span className="text-xl font-bold gradient-text">FrienchTech.Ai</span>
               </a>

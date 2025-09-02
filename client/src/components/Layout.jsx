@@ -34,7 +34,7 @@ export default function Layout({ children }) {
 
             <div className="flex items-center space-x-2">
               <div className="w-6 h-6 rounded-md flex items-center justify-center">
-                <img src="/logo.png" alt="FrienchTech.Ai" className="w-6 h-6 rounded-md" />
+                <img src="/ft-logo.png" alt="FrienchTech.Ai" className="w-6 h-6 rounded-md object-contain" />
               </div>
               <span className="text-lg font-bold">FrienchTech.Ai</span>
             </div>
