@@ -170,8 +170,8 @@ export default function Landing() {
                 {/* Floating icon with glow effect */}
                 <div className="relative mb-8 flex justify-center">
                   <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center shadow-lg backdrop-blur-sm border border-primary/10">
-                    <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
-                      <i className="fas fa-user text-primary text-2xl" />
+                    <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center p-2">
+                      <img src="/ft-logo-signin.png" alt="FrienchTech.Ai" className="w-full h-full object-contain" />
                     </div>
                   </div>
                 </div>
