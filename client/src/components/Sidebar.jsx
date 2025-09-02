@@ -58,7 +58,25 @@ function SidebarComponent() {
   return (
     <>
       <Sidebar collapsible="icon" className="border-r">
-        
+        <div className="absolute top-4 -right-3 z-50">
+          <SidebarTrigger />
+        </div>
+        <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" asChild>
+                <Link href="/" data-testid="sidebar-logo">
+                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
+                    <img src="/ft-logo.png" alt="FrienchTech.Ai" className="size-8 rounded-lg" />
+                  </div>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-semibold">FrienchTech.Ai</span>
+                  </div>
+                </Link>
+              </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
       
       <SidebarContent>
         <SidebarGroup>
