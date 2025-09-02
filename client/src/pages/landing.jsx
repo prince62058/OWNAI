@@ -205,7 +205,6 @@ export default function Landing() {
                     data-testid="signin-apple"
                   >
                     <div className="w-6 h-6 bg-black rounded-lg flex items-center justify-center mr-4 group-hover:scale-110 transition-transform p-1">
-                      <img src="/apple-logo.png" alt="Apple" className="w-full h-full object-contain" />
                     </div>
                     <span className="font-medium">Continue with Apple</span>
                   </Button>
