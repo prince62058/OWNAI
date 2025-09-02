@@ -138,21 +138,7 @@ function SidebarComponent() {
 
       <SidebarFooter>
         <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton onClick={toggleTheme} data-testid="sidebar-theme-toggle">
-              {theme === "dark" ? (
-                <>
-                  <Sun />
-                  <span>Light mode</span>
-                </>
-              ) : (
-                <>
-                  <Moon />
-                  <span>Dark mode</span>
-                </>
-              )}
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+          
           
           {isAuthenticated ? (
             <>
