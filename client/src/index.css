@@ -70,6 +70,33 @@
     background-clip: text;
   }
 
+  /* Custom scrollbar styles */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #333333;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #000000;
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: #555555;
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: #000000;
+  }
+
   .search-input {
     background: hsl(var(--card));
     border: 2px solid hsl(var(--border));
