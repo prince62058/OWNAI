@@ -1,9 +1,11 @@
 import OpenAI from "openai";
 
 // the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
-const openai = new OpenAI({ 
-  apiKey: process.env.OPENAI_API_KEY || process.env.OPENAI_KEY || process.env.API_KEY 
-});
+const openai = process.env.OPENAI_API_KEY || process.env.OPENAI_KEY || process.env.API_KEY 
+  ? new OpenAI({ 
+      apiKey: process.env.OPENAI_API_KEY || process.env.OPENAI_KEY || process.env.API_KEY 
+    })
+  : null;
 
 interface AISearchResponse {
   content: string;
@@ -15,6 +17,13 @@ interface AISearchResponse {
 }
 
 export async function generateAIResponse(query: string, category?: string): Promise<AISearchResponse> {
+  if (!openai) {
+    return {
+      content: "AI search is currently unavailable. Please configure an OpenAI API key to enable AI-powered responses.",
+      sources: []
+    };
+  }
+
   try {
     const systemPrompt = `You are an AI assistant that provides accurate, informative responses to user queries. 
     ${category ? `Focus your response on the ${category} category.` : ''}
@@ -66,6 +75,19 @@ export async function generateAIResponse(query: string, category?: string): Prom
 }
 
 export async function generateSearchSuggestions(query: string): Promise<string[]> {
+  if (!openai) {
+    // Simple fallback suggestions when OpenAI is not available
+    const fallbackSuggestions = [
+      `What is ${query}?`,
+      `How does ${query} work?`,
+      `Latest news about ${query}`,
+      `${query} explained`,
+      `Best practices for ${query}`
+    ];
+    
+    return fallbackSuggestions.slice(0, 3);
+  }
+
   try {
     const response = await openai.chat.completions.create({
       model: "gpt-5",
@@ -110,6 +132,10 @@ export async function generateSearchSuggestions(query: string): Promise<string[]
 }
 
 export async function categorizeQuery(query: string): Promise<string | null> {
+  if (!openai) {
+    return null;
+  }
+
   try {
     const response = await openai.chat.completions.create({
       model: "gpt-5",
