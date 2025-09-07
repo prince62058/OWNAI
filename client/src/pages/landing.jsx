@@ -1,14 +1,31 @@
-import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect, useRef } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import Layout from "@/components/Layout";
-import SearchInterface from "@/components/SearchInterface";
 import CategoryCard from "@/components/CategoryCard";
 import TrendingCard from "@/components/TrendingCard";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Plus } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Send, User, Bot, Plus } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 
 export default function Landing() {
+  const [messages, setMessages] = useState([
+    {
+      id: 1,
+      type: "ai",
+      content: "Hello! I'm your AI assistant. You can ask me anything!",
+      timestamp: new Date()
+    }
+  ]);
+  const [input, setInput] = useState("");
+  const [showChat, setShowChat] = useState(false);
+  const { toast } = useToast();
+  const messagesEndRef = useRef(null);
   const [, setLocation] = useLocation();
 
   const { data: categories = [] } = useQuery({
@@ -26,16 +43,75 @@ export default function Landing() {
     retry: false,
   });
 
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const chatMutation = useMutation({
+    mutationFn: async (message) => {
+      const response = await apiRequest("POST", "/api/search", { 
+        query: message 
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    },
+    onSuccess: (data, variables) => {
+      const aiMessage = {
+        id: Date.now() + 1,
+        type: "ai",
+        content: data.response,
+        sources: data.sources || [],
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, aiMessage]);
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSend = () => {
+    if (!input.trim()) return;
+
+    const userMessage = {
+      id: Date.now(),
+      type: "user",
+      content: input.trim(),
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    chatMutation.mutate(input.trim());
+    setInput("");
+    setShowChat(true);
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
   const handleTopicClick = (topic) => {
     const searchParams = new URLSearchParams({ q: topic.title });
     setLocation(`/search?${searchParams.toString()}`);
   };
 
   const handleCreateThread = () => {
-    setLocation("/");
-    // Focus on search input after navigation
+    setShowChat(true);
     setTimeout(() => {
-      const searchInput = document.querySelector('[data-testid="search-input"]');
+      const searchInput = document.querySelector('[data-testid="chat-input"]');
       searchInput?.focus();
     }, 100);
   };
@@ -43,236 +119,292 @@ export default function Landing() {
   return (
     <Layout>
       <main className="flex-1 pb-20 md:pb-0">
-        {/* Hero Section with Search */}
-        <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 overflow-hidden">
-          {/* Spline 3D Background */}
-          <div className="absolute inset-0 w-full h-full z-0">
-            <iframe 
-              src='https://my.spline.design/retrofuturisticcircuitloop-80c0cN4NN5WUDdFm77fNa740/' 
-              frameBorder='0' 
-              width='100%' 
-              height='100%'
-              className="w-full h-full"
-            />
-          </div>
-          
-          <div className="container mx-auto max-w-4xl text-center relative z-20">
-            <div className="fade-in">
-              <h1 className="text-4xl sm:text-6xl lg:text-7xl mb-4 font-light leading-tight" data-testid="hero-title">
-                <span className="text-white">Hi, I'm </span>
-                <span className="text-cyan-400 font-medium">PrinceTech</span>
-                <br />
-                <span className="text-blue-400 font-medium">AI</span>
-              </h1>
-              <p className="text-xl text-cyan-300/90 mb-8 font-medium tracking-wide" data-testid="hero-subtitle">
-                AI/ML Enthusiast
-              </p>
-              <p className="text-lg text-blue-200/70 mb-12 max-w-2xl mx-auto leading-relaxed" data-testid="hero-description">
-                Ask anything and get instant, accurate answers with cited sources. 
-                Powered by advanced AI and real-time web search.
-              </p>
-
-              <SearchInterface size="large" autoFocus />
+        {!showChat ? (
+          // Hero Section with Search
+          <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 overflow-hidden">
+            {/* Spline 3D Background */}
+            <div className="absolute inset-0 w-full h-full z-0">
+              <iframe 
+                src='https://my.spline.design/retrofuturisticcircuitloop-80c0cN4NN5WUDdFm77fNa740/' 
+                frameBorder='0' 
+                width='100%' 
+                height='100%'
+                className="w-full h-full"
+              />
             </div>
-          </div>
-        </section>
+            
+            <div className="container mx-auto max-w-4xl text-center relative z-20">
+              <div className="fade-in">
+                <h1 className="text-4xl sm:text-6xl lg:text-7xl mb-4 font-light leading-tight" data-testid="hero-title">
+                  <span className="text-white">Hi, I'm </span>
+                  <span className="text-cyan-400 font-medium">PrinceTech</span>
+                  <br />
+                  <span className="text-blue-400 font-medium">AI</span>
+                </h1>
+                <p className="text-xl text-cyan-300/90 mb-8 font-medium tracking-wide" data-testid="hero-subtitle">
+                  AI/ML Enthusiast
+                </p>
+                <p className="text-lg text-blue-200/70 mb-12 max-w-2xl mx-auto leading-relaxed" data-testid="hero-description">
+                  Ask anything and get instant, accurate answers with cited sources. 
+                  Powered by advanced AI and real-time web search.
+                </p>
 
-        {/* Category Navigation */}
-        <section className="py-16 px-4 sm:px-6 lg:px-8 bg-muted/30">
-          <div className="container mx-auto max-w-6xl">
-            <h2 className="text-2xl font-semibold mb-8 text-center" data-testid="categories-title">
-              Explore by Category
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {categories.map((category) => (
-                <CategoryCard
-                  key={category.id}
-                  id={category.id}
-                  name={category.name}
-                  description={category.description}
-                  icon={category.icon}
-                  color={category.color}
-                  href={category.href}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Trending Section */}
-        <section className="py-16 px-4 sm:px-6 lg:px-8">
-          <div className="container mx-auto max-w-6xl">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-semibold" data-testid="trending-title">Trending Now</h2>
-              <Button
-                variant="ghost"
-                onClick={() => setLocation("/discover")}
-                data-testid="view-all-trending"
-              >
-                View all
-              </Button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {trendingTopics.slice(0, 6).map((topic) => (
-                <TrendingCard
-                  key={topic.id}
-                  id={topic.id}
-                  title={topic.title}
-                  description={topic.description}
-                  category={topic.category}
-                  readTime={topic.readTime}
-                  icon={topic.icon}
-                  viewCount={topic.viewCount}
-                  onClick={() => handleTopicClick(topic)}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Spaces/Templates Section */}
-        <section className="py-16 px-4 sm:px-6 lg:px-8 bg-muted/30">
-          <div className="container mx-auto max-w-6xl">
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h2 className="text-2xl font-semibold mb-2" data-testid="spaces-title">Spaces & Templates</h2>
-                <p className="text-muted-foreground">Organized collections for specific topics and workflows</p>
-              </div>
-              <Button
-                variant="ghost"
-                onClick={() => setLocation("/spaces")}
-                data-testid="browse-all-spaces"
-              >
-                Browse all
-              </Button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {spaces.slice(0, 3).map((space) => (
-                <Card key={space.id} className="category-card rounded-xl p-6 group cursor-pointer" data-testid={`space-${space.id}`}>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className={`w-10 h-10 bg-gradient-to-br ${space.gradient} rounded-lg flex items-center justify-center`}>
-                      <i className={`${space.icon} text-white text-sm`} />
-                    </div>
-                    <span className="text-xs text-muted-foreground">{space.templateCount} templates</span>
-                  </div>
-                  <h3 className="font-semibold mb-2" data-testid={`space-title-${space.id}`}>{space.title}</h3>
-                  <p className="text-muted-foreground text-sm mb-4" data-testid={`space-description-${space.id}`}>{space.description}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {space.tags?.slice(0, 2).map((tag, index) => (
-                      <span key={index} className="px-2 py-1 bg-secondary rounded text-xs">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Sign-in Prompt */}
-        <section className="py-16 px-4 sm:px-6 lg:px-8">
-          <div className="container mx-auto max-w-4xl">
-            <div className="text-center mb-12">
-              <h2 className="text-2xl font-semibold mb-4" data-testid="library-title">Your Library</h2>
-              <p className="text-muted-foreground mb-8">Access your search history, saved threads, and collections</p>
-              
-              <Card className="relative p-10 max-w-lg mx-auto border-0 bg-gradient-to-br from-card via-card to-card/80 backdrop-blur-xl shadow-2xl rounded-2xl overflow-hidden">
-                {/* Subtle gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 pointer-events-none" />
-                
-                {/* Floating icon with glow effect */}
-                <div className="relative mb-8 flex justify-center">
-                  <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center shadow-lg backdrop-blur-sm border border-primary/10">
-                    <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center p-2">
-                      <img src="/ft-logo-signin.png" alt="PrinceTech AI" className="w-full h-full object-contain" />
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="relative text-center mb-8">
-                  <h3 className="text-2xl font-bold mb-3 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                    Welcome back
-                  </h3>
-                  <p className="text-muted-foreground text-base leading-relaxed">
-                    Sign in to unlock Pro Search, History, and personalized AI assistance
-                  </p>
-                </div>
-                
-                <div className="relative space-y-4">
-                  <Button
-                    className="w-full h-12 justify-start text-left bg-white/5 border border-white/10 hover:bg-white/10 hover:border-primary/30 transition-all duration-300 rounded-xl group"
-                    variant="outline"
-                    onClick={() => window.location.href = "/api/login"}
-                    data-testid="signin-google"
-                  >
-                    <div className="w-6 h-6 bg-white rounded-lg flex items-center justify-center mr-4 group-hover:scale-110 transition-transform p-1">
-                      <img src="/google-logo.png" alt="Google" className="w-full h-full object-contain" />
-                    </div>
-                    <span className="font-medium">Continue with Google</span>
-                  </Button>
-                  
-                  <Button
-                    className="w-full h-12 justify-start text-left bg-white/5 border border-white/10 hover:bg-white/10 hover:border-primary/30 transition-all duration-300 rounded-xl group"
-                    variant="outline"
-                    onClick={() => window.location.href = "/api/login"}
-                    data-testid="signin-apple"
-                  >
-                    <div className="w-6 h-6 bg-white rounded-lg flex items-center justify-center mr-4 group-hover:scale-110 transition-transform p-1">
-                      <img src="/apple-logo-new.png" alt="Apple" className="w-full h-full object-contain" />
-                    </div>
-                    <span className="font-medium">Continue with Apple</span>
-                  </Button>
-                  
-                  <div className="relative py-4">
-                    <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-border/50" />
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-card px-4 text-muted-foreground font-medium">or continue with</span>
-                    </div>
-                  </div>
-                  
-                  <Button
-                    className="w-full h-12 justify-start text-left bg-white/5 border border-white/10 hover:bg-white/10 hover:border-primary/30 transition-all duration-300 rounded-xl group"
-                    variant="outline"
-                    onClick={() => window.location.href = "/api/login"}
-                    data-testid="signin-email"
-                  >
-                    <div className="w-6 h-6 bg-white rounded-lg flex items-center justify-center mr-4 group-hover:scale-110 transition-transform p-1">
-                      <img src="/email-icon.png" alt="Email" className="w-full h-full object-contain" />
-                    </div>
-                    <span className="font-medium">Email address</span>
-                  </Button>
-                  
-                  <div className="pt-6 text-center">
+                {/* Chat Input */}
+                <div className="max-w-2xl mx-auto mb-8">
+                  <div className="flex gap-2">
+                    <Input
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      placeholder="Ask me anything..."
+                      disabled={chatMutation.isPending}
+                      className="flex-1 h-12 text-lg bg-white/10 backdrop-blur border-white/20 text-white placeholder:text-white/60"
+                      data-testid="chat-input"
+                    />
                     <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-primary hover:text-primary/80 hover:bg-primary/10 transition-all duration-300 rounded-lg px-6"
-                      onClick={() => window.location.href = "/api/login"}
-                      data-testid="sso-signin"
+                      onClick={handleSend}
+                      disabled={!input.trim() || chatMutation.isPending}
+                      size="icon"
+                      className="h-12 w-12"
+                      data-testid="send-button"
                     >
-                      <span className="text-sm font-medium">Enterprise SSO →</span>
+                      <Send className="w-5 h-5" />
                     </Button>
                   </div>
                 </div>
-              </Card>
+
+                <div className="flex flex-wrap justify-center gap-3 mt-8">
+                  {["What is AI?", "Latest tech trends", "How does ChatGPT work?", "Future of technology"].map((prompt) => (
+                    <Button
+                      key={prompt}
+                      variant="outline"
+                      className="px-4 py-2 bg-white/10 backdrop-blur border-white/20 text-white hover:bg-white/20"
+                      onClick={() => {
+                        setInput(prompt);
+                        setTimeout(() => handleSend(), 100);
+                      }}
+                    >
+                      {prompt}
+                    </Button>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        ) : (
+          // Chat Interface
+          <section className="px-4 sm:px-6 lg:px-8 py-4">
+            <div className="max-w-4xl mx-auto">
+              {/* Chat Header */}
+              <div className="mb-4 flex justify-between items-center">
+                <div>
+                  <h1 className="text-2xl font-bold">AI Chat</h1>
+                  <p className="text-muted-foreground">Chat with your AI assistant</p>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowChat(false)}
+                  className="text-sm"
+                >
+                  Back to Home
+                </Button>
+              </div>
+
+              {/* Messages Area */}
+              <Card className="p-4 mb-4 overflow-hidden">
+                <ScrollArea className="h-[60vh] pr-4">
+                  <div className="space-y-4">
+                    {messages.map((message) => (
+                      <div
+                        key={message.id}
+                        className={`flex gap-3 ${
+                          message.type === "user" ? "flex-row-reverse" : "flex-row"
+                        }`}
+                      >
+                        <Avatar className="w-8 h-8">
+                          <AvatarFallback>
+                            {message.type === "user" ? (
+                              <User className="w-4 h-4" />
+                            ) : (
+                              <Bot className="w-4 h-4" />
+                            )}
+                          </AvatarFallback>
+                        </Avatar>
+                        
+                        <div
+                          className={`max-w-[80%] rounded-lg p-3 ${
+                            message.type === "user"
+                              ? "bg-primary text-primary-foreground ml-auto"
+                              : "bg-muted"
+                          }`}
+                        >
+                          <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                          
+                          {/* Show sources for AI messages */}
+                          {message.type === "ai" && message.sources && message.sources.length > 0 && (
+                            <div className="mt-2 pt-2 border-t border-border/20">
+                              <p className="text-xs text-muted-foreground mb-1">Sources:</p>
+                              <div className="space-y-1">
+                                {message.sources.slice(0, 3).map((source, idx) => (
+                                  <a
+                                    key={idx}
+                                    href={source.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="block text-xs text-blue-500 hover:text-blue-600 truncate"
+                                  >
+                                    {source.title}
+                                  </a>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          <div className="flex justify-end mt-1">
+                            <span className="text-xs text-muted-foreground">
+                              {message.timestamp.toLocaleTimeString('en-US', { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                              })}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    
+                    {/* Loading indicator */}
+                    {chatMutation.isPending && (
+                      <div className="flex gap-3">
+                        <Avatar className="w-8 h-8">
+                          <AvatarFallback>
+                            <Bot className="w-4 h-4" />
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="bg-muted rounded-lg p-3">
+                          <div className="flex space-x-1">
+                            <div className="w-2 h-2 bg-current rounded-full animate-bounce"></div>
+                            <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                            <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div ref={messagesEndRef} />
+                  </div>
+                </ScrollArea>
+              </Card>
+
+              {/* Input Area */}
+              <div className="flex gap-2">
+                <Input
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Ask me anything..."
+                  disabled={chatMutation.isPending}
+                  className="flex-1"
+                  data-testid="chat-input-main"
+                />
+                <Button
+                  onClick={handleSend}
+                  disabled={!input.trim() || chatMutation.isPending}
+                  size="icon"
+                  data-testid="send-button-main"
+                >
+                  <Send className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {!showChat && (
+          <>
+            {/* Categories Section */}
+            <section className="py-16 px-4 sm:px-6 lg:px-8 bg-background/95 backdrop-blur relative z-10">
+              <div className="container mx-auto max-w-6xl">
+                <div className="text-center mb-12">
+                  <h2 className="text-3xl font-bold mb-4" data-testid="categories-title">
+                    Explore by Category
+                  </h2>
+                  <p className="text-muted-foreground max-w-2xl mx-auto" data-testid="categories-description">
+                    Discover curated content and get specialized insights across different domains
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {categories.map((category) => (
+                    <CategoryCard key={category.id} category={category} />
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            {/* Trending Section */}
+            <section className="py-16 px-4 sm:px-6 lg:px-8 relative z-10">
+              <div className="container mx-auto max-w-6xl">
+                <div className="flex items-center justify-between mb-8">
+                  <div>
+                    <h2 className="text-3xl font-bold mb-2" data-testid="trending-title">
+                      Trending Now
+                    </h2>
+                    <p className="text-muted-foreground" data-testid="trending-description">
+                      Popular topics and discussions happening right now
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    onClick={handleCreateThread}
+                    className="flex items-center gap-2"
+                    data-testid="create-thread-button"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Start Chat
+                  </Button>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {trendingTopics.slice(0, 6).map((topic) => (
+                    <TrendingCard 
+                      key={topic.id} 
+                      topic={topic} 
+                      onClick={() => handleTopicClick(topic)}
+                    />
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            {/* Spaces Section */}
+            <section className="py-16 px-4 sm:px-6 lg:px-8 bg-muted/30 relative z-10">
+              <div className="container mx-auto max-w-6xl">
+                <div className="text-center mb-12">
+                  <h2 className="text-3xl font-bold mb-4" data-testid="spaces-title">
+                    Popular Spaces
+                  </h2>
+                  <p className="text-muted-foreground max-w-2xl mx-auto" data-testid="spaces-description">
+                    Join discussions in specialized communities and discover new perspectives
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {spaces.slice(0, 6).map((space) => (
+                    <Card key={space.id} className="p-6 hover:shadow-lg transition-shadow cursor-pointer group" data-testid={`space-${space.id}`}>
+                      <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors">{space.title}</h3>
+                      <p className="text-sm text-muted-foreground mb-4">{space.description}</p>
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>{space.category}</span>
+                        <span>{space.memberCount || 0} members</span>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            </section>
+          </>
+        )}
       </main>
-      {/* Floating Action Button */}
-      <Button
-        size="icon"
-        className="floating-action w-14 h-14 rounded-full shadow-lg hover:scale-105 transition-all"
-        onClick={handleCreateThread}
-        data-testid="create-thread-fab"
-      >
-        <Plus className="h-6 w-6" />
-      </Button>
     </Layout>
   );
 }

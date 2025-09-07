@@ -6,7 +6,6 @@ export default function MobileNav() {
 
   const navItems = [
     { label: "Home", href: "/", icon: Home },
-    { label: "Chat", href: "/chat", icon: MessageCircle },
     { label: "Discover", href: "/discover", icon: Compass },
     { label: "Spaces", href: "/spaces", icon: Grid3X3 },
   ];
