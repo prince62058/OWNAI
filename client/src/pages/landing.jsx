@@ -7,7 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Send, User, Bot, Plus, MessageSquare, Library, Search } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Send, User, Bot, Plus, MessageSquare, Library, Search, Trash2, MoreVertical } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 
@@ -51,8 +57,8 @@ export default function Landing() {
       
       // Set messages from thread data
       if (data.thread && data.thread.messages) {
-        setMessages(data.thread.messages.map(msg => ({
-          id: msg.timestamp || Date.now(),
+        setMessages(data.thread.messages.map((msg, index) => ({
+          id: `${msg.timestamp || Date.now()}-${index}`,
           type: msg.type,
           content: msg.content,
           sources: msg.sources || [],
@@ -102,8 +108,8 @@ export default function Landing() {
       if (response.ok) {
         const thread = await response.json();
         setCurrentThreadId(threadId);
-        setMessages(thread.messages.map(msg => ({
-          id: msg.timestamp || Date.now(),
+        setMessages(thread.messages.map((msg, index) => ({
+          id: `${msg.timestamp || Date.now()}-${index}`,
           type: msg.type,
           content: msg.content,
           sources: msg.sources || [],
@@ -115,6 +121,37 @@ export default function Landing() {
       toast({
         title: "Error",
         description: "Failed to load chat thread",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Delete thread function
+  const deleteThread = async (threadId, e) => {
+    e.stopPropagation(); // Prevent thread loading when delete is clicked
+    
+    try {
+      const response = await apiRequest("DELETE", `/api/chat/threads/${threadId}`);
+      if (response.ok) {
+        // If current thread is deleted, reset the chat
+        if (currentThreadId === threadId) {
+          setCurrentThreadId(null);
+          setMessages([]);
+          setShowChat(false);
+        }
+        
+        // Refresh threads list
+        refetchThreads();
+        
+        toast({
+          title: "Success",
+          description: "Chat thread deleted successfully",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete chat thread",
         variant: "destructive",
       });
     }
@@ -157,25 +194,51 @@ export default function Landing() {
               <div className="text-sm text-muted-foreground px-2 mb-2">Recent Chats</div>
               {chatThreads && chatThreads.length > 0 ? (
                 chatThreads.map((thread) => (
-                  <Button
-                    key={thread.id}
-                    variant={currentThreadId === thread.id ? "secondary" : "ghost"}
-                    className="w-full justify-start h-auto p-3 text-left"
-                    onClick={() => loadThread(thread.id)}
-                    data-testid={`thread-${thread.id}`}
-                  >
-                    <div className="flex flex-col items-start w-full">
-                      <div className="font-medium text-sm truncate w-full">
-                        {thread.title}
+                  <div key={thread.id} className="relative group">
+                    <Button
+                      variant={currentThreadId === thread.id ? "secondary" : "ghost"}
+                      className="w-full justify-start h-auto p-3 text-left pr-10"
+                      onClick={() => loadThread(thread.id)}
+                      data-testid={`thread-${thread.id}`}
+                    >
+                      <div className="flex flex-col items-start w-full">
+                        <div className="font-medium text-sm truncate w-full">
+                          {thread.title}
+                        </div>
+                        <div className="text-xs text-muted-foreground truncate w-full">
+                          {thread.lastMessage}
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {new Date(thread.updatedAt).toLocaleDateString()}
+                        </div>
                       </div>
-                      <div className="text-xs text-muted-foreground truncate w-full">
-                        {thread.lastMessage}
-                      </div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        {new Date(thread.updatedAt).toLocaleDateString()}
-                      </div>
+                    </Button>
+                    
+                    <div className="absolute right-2 top-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 w-6 p-0"
+                            data-testid={`thread-menu-${thread.id}`}
+                          >
+                            <MoreVertical className="h-3 w-3" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={(e) => deleteThread(thread.id, e)}
+                            className="text-red-600 focus:text-red-600"
+                            data-testid={`delete-thread-${thread.id}`}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
-                  </Button>
+                  </div>
                 ))
               ) : (
                 <div className="text-xs text-muted-foreground px-2">
