@@ -1,16 +1,8 @@
-import OpenAI from "openai";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Initialize Google Gemini AI as primary service
+// Initialize Google Gemini AI
 const geminiAPI = process.env.GOOGLE_API_KEY ? new GoogleGenerativeAI(process.env.GOOGLE_API_KEY) : null;
 const gemini = geminiAPI ? geminiAPI.getGenerativeModel({ model: "gemini-1.5-flash" }) : null;
-
-// Fallback to OpenAI if Gemini is not available
-const openai = process.env.OPENAI_API_KEY || process.env.OPENAI_KEY || process.env.API_KEY 
-  ? new OpenAI({ 
-      apiKey: process.env.OPENAI_API_KEY || process.env.OPENAI_KEY || process.env.API_KEY 
-    })
-  : null;
 
 interface AISearchResponse {
   content: string;
@@ -43,7 +35,7 @@ export async function generateAIResponse(query: string, category?: string): Prom
     3. Keep the response comprehensive but concise
     4. Use proper formatting and structure`;
 
-  // Try Gemini first
+  // Use Gemini AI
   if (gemini) {
     try {
       const result = await gemini.generateContent([
@@ -72,40 +64,14 @@ export async function generateAIResponse(query: string, category?: string): Prom
       }
     } catch (error) {
       console.error("Gemini API error:", error);
-      // Fall through to OpenAI fallback
-    }
-  }
-
-  // Fallback to OpenAI
-  if (openai) {
-    try {
-      const response = await openai.chat.completions.create({
-        model: "gpt-5",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: query }
-        ],
-        response_format: { type: "json_object" },
-        temperature: 0.7,
-        max_tokens: 2000,
-      });
-
-      const result = JSON.parse(response.choices[0].message.content || '{}');
-      
-      return {
-        content: result.content || "I'm sorry, I couldn't generate a response to your query.",
-        sources: result.sources || []
-      };
-    } catch (error) {
-      console.error("OpenAI API error:", error);
+      // Fall through to fallback
     }
   }
 
   // Enhanced fallback with useful content based on query
-  const fallbackContent = generateFallbackResponse(query, category);
   return {
-    content: fallbackContent.content,
-    sources: fallbackContent.sources
+    content: "I'm sorry, I couldn't generate a response to your query at this time. Please try again later or rephrase your question.",
+    sources: []
   };
 }
 
@@ -118,7 +84,7 @@ export async function generateSearchSuggestions(query: string): Promise<string[]
   
   Return only a JSON array of strings in this exact format: ["suggestion 1", "suggestion 2", "suggestion 3"]`;
 
-  // Try Gemini first
+  // Use Gemini AI
   if (gemini) {
     try {
       const result = await gemini.generateContent([
@@ -140,7 +106,7 @@ export async function generateSearchSuggestions(query: string): Promise<string[]
         // Try to extract array-like content
         if (cleanText.includes('[') && cleanText.includes(']')) {
           try {
-            const arrayMatch = cleanText.match(/\[.*\]/s);
+            const arrayMatch = cleanText.match(/\[.*\]/gs);
             if (arrayMatch) {
               const parsed = JSON.parse(arrayMatch[0]);
               return Array.isArray(parsed) ? parsed : [];
@@ -153,41 +119,7 @@ export async function generateSearchSuggestions(query: string): Promise<string[]
       }
     } catch (error) {
       console.error("Gemini search suggestions error:", error);
-      // Fall through to OpenAI fallback
-    }
-  }
-
-  // Fallback to OpenAI
-  if (openai) {
-    try {
-      const response = await openai.chat.completions.create({
-        model: "gpt-5",
-        messages: [
-          {
-            role: "system",
-            content: `Generate 3-5 search suggestions based on the user's partial query. 
-            The suggestions should be:
-            1. Related to the user's input
-            2. Complete, searchable questions or topics
-            3. Diverse and covering different angles
-            4. Formatted as a JSON object with suggestions array
-            
-            Example format: {"suggestions": ["suggestion 1", "suggestion 2", "suggestion 3"]}`
-          },
-          {
-            role: "user",
-            content: `Partial query: "${query}"`
-          }
-        ],
-        response_format: { type: "json_object" },
-        temperature: 0.8,
-        max_tokens: 200,
-      });
-
-      const result = JSON.parse(response.choices[0].message.content || '{}');
-      return Array.isArray(result.suggestions) ? result.suggestions : [];
-    } catch (error) {
-      console.error("OpenAI search suggestions error:", error);
+      // Fall through to fallback
     }
   }
 
@@ -215,7 +147,7 @@ export async function categorizeQuery(query: string): Promise<string | null> {
   
   Respond with only the category name as a single word, or "null" if it doesn't fit any category.`;
 
-  // Try Gemini first
+  // Use Gemini AI
   if (gemini) {
     try {
       const result = await gemini.generateContent([
@@ -234,43 +166,7 @@ export async function categorizeQuery(query: string): Promise<string | null> {
       return null;
     } catch (error) {
       console.error("Gemini categorization error:", error);
-      // Fall through to OpenAI fallback
-    }
-  }
-
-  // Fallback to OpenAI
-  if (openai) {
-    try {
-      const response = await openai.chat.completions.create({
-        model: "gpt-5",
-        messages: [
-          {
-            role: "system",
-            content: `Categorize the following query into one of these categories:
-            - Finance
-            - Travel
-            - Shopping
-            - Academic
-            - Technology
-            - Health
-            - null (if it doesn't fit any category)
-            
-            Respond with JSON format: {"category": "category_name"}`
-          },
-          {
-            role: "user",
-            content: query
-          }
-        ],
-        response_format: { type: "json_object" },
-        temperature: 0.3,
-        max_tokens: 50,
-      });
-
-      const result = JSON.parse(response.choices[0].message.content || '{}');
-      return result.category || null;
-    } catch (error) {
-      console.error("OpenAI categorization error:", error);
+      // Fall through to fallback
     }
   }
 
