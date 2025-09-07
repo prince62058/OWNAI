@@ -63,7 +63,6 @@ function SidebarComponent() {
               <SidebarMenuButton size="lg" asChild className="group-data-[collapsible=icon]:!justify-center">
                 <Link href="/" data-testid="sidebar-logo">
                   <div className="flex aspect-square size-8 items-center justify-center rounded-lg flex-shrink-0 min-w-8">
-                    <img src="/ft-logo.png" alt="PrinceTech AI" className="size-8 rounded-lg object-contain" />
                   </div>
                   <div className="grid flex-1 text-left text-sm leading-tight min-w-0 group-data-[collapsible=icon]:hidden">
                     <span className="truncate font-semibold">PrinceTech AI</span>
