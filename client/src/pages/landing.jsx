@@ -47,9 +47,6 @@ export default function Landing() {
         <section className="py-20 px-4 sm:px-6 lg:px-8">
           <div className="container mx-auto max-w-4xl text-center">
             <div className="fade-in">
-              <div className="flex justify-center items-center mb-8 w-full">
-                <img src="/ft-logo.png" alt="PrinceTech AI" className="w-16 h-16 object-contain mx-auto" />
-              </div>
               <h1 className="sm:text-5xl lg:text-6xl mb-6 font-light text-[58px]" data-testid="hero-title">PrinceTech AI</h1>
               <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto" data-testid="hero-description">
                 Ask anything and get instant, accurate answers with cited sources. 
