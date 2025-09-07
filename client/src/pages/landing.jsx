@@ -280,112 +280,126 @@ export default function Landing() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-background">
-        {/* Header */}
-        <header className="border-b">
-          <div className="max-w-6xl mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                  <MessageSquare className="w-4 h-4 text-white" />
+      <div className="min-h-screen bg-background relative overflow-hidden">
+        {/* 3D Background Animation */}
+        <div className="absolute inset-0 z-0">
+          <iframe 
+            src='https://my.spline.design/retrofuturisticcircuitloop-80c0cN4NN5WUDdFm77fNa740/' 
+            frameBorder='0' 
+            width='100%' 
+            height='100%'
+            className="pointer-events-none"
+          />
+        </div>
+
+        {/* Content Overlay */}
+        <div className="relative z-10">
+          {/* Header */}
+          <header className="border-b bg-background/80 backdrop-blur-sm">
+            <div className="max-w-6xl mx-auto px-4 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                    <MessageSquare className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="font-semibold text-xl">PrinceTech AI</span>
                 </div>
-                <span className="font-semibold text-xl">PrinceTech AI</span>
+                
+                <nav className="hidden md:flex items-center gap-6">
+                  <a href="#" className="text-sm text-muted-foreground hover:text-foreground">Discover</a>
+                  <a href="#" className="text-sm text-muted-foreground hover:text-foreground">Library</a>
+                  <Button variant="outline" size="sm">Sign in</Button>
+                </nav>
+              </div>
+            </div>
+          </header>
+
+          {/* Main Content */}
+          <main className="max-w-4xl mx-auto px-4 py-16">
+            <div className="text-center mb-12">
+              <h1 className="text-5xl font-light mb-6 text-foreground drop-shadow-lg" data-testid="hero-title">
+                PrinceTech AI
+              </h1>
+              <p className="text-xl text-muted-foreground mb-8 drop-shadow-sm" data-testid="hero-subtitle">
+                Ask anything and get instant, accurate answers with cited sources
+              </p>
+            </div>
+
+            {/* Search Input */}
+            <div className="max-w-2xl mx-auto mb-8">
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Input
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Ask anything..."
+                  disabled={chatMutation.isPending}
+                  className="pl-12 h-14 text-lg rounded-xl border-2 focus:border-blue-500 bg-background/80 backdrop-blur-sm"
+                  data-testid="main-search-input"
+                />
+                <Button
+                  onClick={handleSend}
+                  disabled={!input.trim() || chatMutation.isPending}
+                  size="sm"
+                  className="absolute right-2 top-2 h-10 px-4 rounded-lg"
+                  data-testid="main-search-button"
+                >
+                  <Send className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Suggested Questions */}
+            <div className="max-w-2xl mx-auto mb-16">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {suggestedQuestions.map((question, idx) => (
+                  <Button
+                    key={idx}
+                    variant="outline"
+                    className="justify-start h-auto p-4 text-left rounded-xl hover:bg-muted/50 bg-background/70 backdrop-blur-sm border-muted/50"
+                    onClick={() => {
+                      setInput(question);
+                      setTimeout(() => handleSend(), 100);
+                    }}
+                    data-testid={`suggested-question-${idx}`}
+                  >
+                    <div>
+                      <div className="font-medium text-sm">{question}</div>
+                    </div>
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* Features */}
+            <div className="grid md:grid-cols-3 gap-8 mb-16">
+              <div className="text-center bg-background/60 backdrop-blur-sm rounded-xl p-6 border border-muted/30">
+                <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Search className="w-6 h-6 text-blue-600" />
+                </div>
+                <h3 className="font-semibold mb-2">Real-time Search</h3>
+                <p className="text-sm text-muted-foreground">Get up-to-date information from across the web with comprehensive source citations.</p>
               </div>
               
-              <nav className="hidden md:flex items-center gap-6">
-                <a href="#" className="text-sm text-muted-foreground hover:text-foreground">Discover</a>
-                <a href="#" className="text-sm text-muted-foreground hover:text-foreground">Library</a>
-                <Button variant="outline" size="sm">Sign in</Button>
-              </nav>
-            </div>
-          </div>
-        </header>
-
-        {/* Main Content */}
-        <main className="max-w-4xl mx-auto px-4 py-16">
-          <div className="text-center mb-12">
-            <h1 className="text-5xl font-light mb-6" data-testid="hero-title">
-              PrinceTech AI
-            </h1>
-            <p className="text-xl text-muted-foreground mb-8" data-testid="hero-subtitle">
-              Ask anything and get instant, accurate answers with cited sources
-            </p>
-          </div>
-
-          {/* Search Input */}
-          <div className="max-w-2xl mx-auto mb-8">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <Input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Ask anything..."
-                disabled={chatMutation.isPending}
-                className="pl-12 h-14 text-lg rounded-xl border-2 focus:border-blue-500"
-                data-testid="main-search-input"
-              />
-              <Button
-                onClick={handleSend}
-                disabled={!input.trim() || chatMutation.isPending}
-                size="sm"
-                className="absolute right-2 top-2 h-10 px-4 rounded-lg"
-                data-testid="main-search-button"
-              >
-                <Send className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Suggested Questions */}
-          <div className="max-w-2xl mx-auto mb-16">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {suggestedQuestions.map((question, idx) => (
-                <Button
-                  key={idx}
-                  variant="outline"
-                  className="justify-start h-auto p-4 text-left rounded-xl hover:bg-muted/50"
-                  onClick={() => {
-                    setInput(question);
-                    setTimeout(() => handleSend(), 100);
-                  }}
-                  data-testid={`suggested-question-${idx}`}
-                >
-                  <div>
-                    <div className="font-medium text-sm">{question}</div>
-                  </div>
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {/* Features */}
-          <div className="grid md:grid-cols-3 gap-8 mb-16">
-            <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Search className="w-6 h-6 text-blue-600" />
+              <div className="text-center bg-background/60 backdrop-blur-sm rounded-xl p-6 border border-muted/30">
+                <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Bot className="w-6 h-6 text-purple-600" />
+                </div>
+                <h3 className="font-semibold mb-2">AI-Powered</h3>
+                <p className="text-sm text-muted-foreground">Advanced AI understands context and provides detailed, accurate responses.</p>
               </div>
-              <h3 className="font-semibold mb-2">Real-time Search</h3>
-              <p className="text-sm text-muted-foreground">Get up-to-date information from across the web with comprehensive source citations.</p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/20 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Bot className="w-6 h-6 text-purple-600" />
+              
+              <div className="text-center bg-background/60 backdrop-blur-sm rounded-xl p-6 border border-muted/30">
+                <div className="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Library className="w-6 h-6 text-green-600" />
+                </div>
+                <h3 className="font-semibold mb-2">Comprehensive</h3>
+                <p className="text-sm text-muted-foreground">Explore any topic with detailed explanations and reliable source verification.</p>
               </div>
-              <h3 className="font-semibold mb-2">AI-Powered</h3>
-              <p className="text-sm text-muted-foreground">Advanced AI understands context and provides detailed, accurate responses.</p>
             </div>
-            
-            <div className="text-center">
-              <div className="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Library className="w-6 h-6 text-green-600" />
-              </div>
-              <h3 className="font-semibold mb-2">Comprehensive</h3>
-              <p className="text-sm text-muted-foreground">Explore any topic with detailed explanations and reliable source verification.</p>
-            </div>
-          </div>
-        </main>
+          </main>
+        </div>
       </div>
     </Layout>
   );
