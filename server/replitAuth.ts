@@ -15,9 +15,11 @@ if (!domains && process.env.NODE_ENV !== "production") {
 
 const getOidcConfig = memoize(
   async () => {
+    // Handle missing REPL_ID in production deployments
+    const replId = process.env.REPL_ID || 'fallback-client-id';
     return await client.discovery(
       new URL(process.env.ISSUER_URL ?? "https://replit.com/oidc"),
-      process.env.REPL_ID!
+      replId
     );
   },
   { maxAge: 3600 * 1000 }
