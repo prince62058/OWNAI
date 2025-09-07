@@ -44,21 +44,8 @@ export default function Landing() {
     <Layout>
       <main className="flex-1 pb-20 md:pb-0">
         {/* Hero Section with Search */}
-        <section className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
-          {/* Spline 3D Background */}
-          <div className="absolute inset-0 w-full h-full z-0">
-            <iframe 
-              src='https://my.spline.design/retrofuturisticcircuitloop-80c0cN4NN5WUDdFm77fNa740/' 
-              frameBorder='0' 
-              width='100%' 
-              height='100%'
-              className="w-full h-full object-cover"
-            />
-          </div>
-          {/* Overlay for better text readability */}
-          <div className="absolute inset-0 bg-background/30 backdrop-blur-[2px] z-10"></div>
-          
-          <div className="container mx-auto max-w-4xl text-center relative z-20">
+        <section className="py-20 px-4 sm:px-6 lg:px-8">
+          <div className="container mx-auto max-w-4xl text-center">
             <div className="fade-in">
               <h1 className="sm:text-5xl lg:text-6xl mb-6 font-light text-[58px]" data-testid="hero-title">PrinceTech AI</h1>
               <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto" data-testid="hero-description">
