@@ -335,7 +335,7 @@ export default function Landing() {
                   onKeyPress={handleKeyPress}
                   placeholder="Ask anything..."
                   disabled={chatMutation.isPending}
-                  className="pl-12 h-14 text-lg rounded-xl border-2 focus:border-blue-500 bg-background/80 backdrop-blur-sm"
+                  className="pl-12 h-14 text-lg rounded-xl border-2 focus:border-blue-500 bg-black/80 backdrop-blur-sm text-white"
                   data-testid="main-search-input"
                 />
                 <Button
