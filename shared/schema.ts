@@ -74,6 +74,26 @@ export const spaces = pgTable("spaces", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Chat conversations table
+export const conversations = pgTable("conversations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id),
+  title: varchar("title"),
+  summary: text("summary"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Chat messages table
+export const messages = pgTable("messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  conversationId: varchar("conversation_id").references(() => conversations.id),
+  role: varchar("role").notNull(), // 'user' or 'assistant'
+  content: text("content").notNull(),
+  sources: jsonb("sources"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // User search history
 export const searchHistory = pgTable("search_history", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -98,6 +118,17 @@ export const insertSpaceSchema = createInsertSchema(spaces).omit({
   createdAt: true,
 });
 
+export const insertConversationSchema = createInsertSchema(conversations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertMessageSchema = createInsertSchema(messages).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -108,3 +139,7 @@ export type TrendingTopic = typeof trendingTopics.$inferSelect;
 export type InsertSpace = z.infer<typeof insertSpaceSchema>;
 export type Space = typeof spaces.$inferSelect;
 export type SearchHistory = typeof searchHistory.$inferSelect;
+export type InsertConversation = z.infer<typeof insertConversationSchema>;
+export type Conversation = typeof conversations.$inferSelect;
+export type InsertMessage = z.infer<typeof insertMessageSchema>;
+export type Message = typeof messages.$inferSelect;
