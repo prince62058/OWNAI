@@ -13,6 +13,7 @@ import Discover from "@/pages/discover";
 import Spaces from "@/pages/spaces";
 import Library from "@/pages/library";
 import Category from "@/pages/category";
+import Chat from "@/pages/chat";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -23,6 +24,7 @@ function Router() {
         <>
           <Route path="/" component={Landing} />
           <Route path="/search" component={Search} />
+          <Route path="/chat" component={Chat} />
           <Route path="/discover" component={Discover} />
           <Route path="/spaces" component={Spaces} />
           <Route path="/:category" component={Category} />
@@ -31,6 +33,7 @@ function Router() {
         <>
           <Route path="/" component={Home} />
           <Route path="/search" component={Search} />
+          <Route path="/chat" component={Chat} />
           <Route path="/discover" component={Discover} />
           <Route path="/spaces" component={Spaces} />
           <Route path="/library" component={Library} />
