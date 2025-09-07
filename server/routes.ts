@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { generateAIResponse, generateSearchSuggestions } from "./openai";
 import { insertSearchSchema, insertConversationSchema, insertMessageSchema } from "@shared/schema";
+import { mongoStorage } from "./mongodb.js";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
@@ -301,7 +302,143 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Chat endpoint with conversation support
+  // MongoDB Chat Threads API
+  app.post('/api/chat/threads', async (req, res) => {
+    try {
+      const { message, threadId } = req.body;
+
+      if (!message) {
+        return res.status(400).json({ message: "Message is required" });
+      }
+
+      console.log(`Processing chat message: "${message.substring(0, 100)}..."`);
+
+      // Generate AI response
+      const aiResponse = await generateAIResponse(message);
+      
+      if (!aiResponse.content) {
+        aiResponse.content = `I apologize, but I wasn't able to generate a response for "${message}". Please try again.`;
+      }
+
+      let thread;
+
+      if (threadId) {
+        // Add to existing thread
+        const userMessage = {
+          type: 'user',
+          content: message,
+          timestamp: new Date()
+        };
+
+        const aiMessage = {
+          type: 'ai',
+          content: aiResponse.content,
+          timestamp: new Date(),
+          sources: aiResponse.sources || []
+        };
+
+        // Add user message
+        await mongoStorage.addMessageToThread(threadId, userMessage);
+        // Add AI response
+        thread = await mongoStorage.addMessageToThread(threadId, aiMessage);
+      } else {
+        // Create new thread
+        const title = message.length > 50 ? message.substring(0, 47) + "..." : message;
+        
+        const firstUserMessage = {
+          type: 'user',
+          content: message,
+          timestamp: new Date()
+        };
+
+        thread = await mongoStorage.createChatThread(title, firstUserMessage);
+
+        // Add AI response
+        const aiMessage = {
+          type: 'ai',
+          content: aiResponse.content,
+          timestamp: new Date(),
+          sources: aiResponse.sources || []
+        };
+
+        thread = await mongoStorage.addMessageToThread(thread._id.toString(), aiMessage);
+      }
+
+      res.json({
+        threadId: thread._id.toString(),
+        response: aiResponse.content,
+        sources: aiResponse.sources || [],
+        thread: {
+          id: thread._id.toString(),
+          title: thread.title,
+          messages: thread.messages,
+          createdAt: thread.createdAt,
+          updatedAt: thread.updatedAt
+        }
+      });
+
+    } catch (error) {
+      console.error("Chat thread error:", error);
+      res.status(500).json({ message: "Chat failed" });
+    }
+  });
+
+  // Get recent chat threads
+  app.get('/api/chat/threads', async (req, res) => {
+    try {
+      const { limit = 10 } = req.query;
+      const threads = await mongoStorage.getRecentThreads(parseInt(limit as string));
+      res.json(threads);
+    } catch (error) {
+      console.error("Get chat threads error:", error);
+      res.status(500).json({ message: "Failed to get chat threads" });
+    }
+  });
+
+  // Get specific thread
+  app.get('/api/chat/threads/:id', async (req, res) => {
+    try {
+      const thread = await mongoStorage.getThreadById(req.params.id);
+      if (!thread) {
+        return res.status(404).json({ message: "Thread not found" });
+      }
+      res.json(thread);
+    } catch (error) {
+      console.error("Get thread error:", error);
+      res.status(500).json({ message: "Failed to get thread" });
+    }
+  });
+
+  // Delete thread
+  app.delete('/api/chat/threads/:id', async (req, res) => {
+    try {
+      const success = await mongoStorage.deleteThread(req.params.id);
+      if (!success) {
+        return res.status(404).json({ message: "Thread not found" });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete thread error:", error);
+      res.status(500).json({ message: "Failed to delete thread" });
+    }
+  });
+
+  // Search threads
+  app.get('/api/chat/search', async (req, res) => {
+    try {
+      const { q, limit = 10 } = req.query;
+      if (!q || typeof q !== 'string') {
+        return res.json([]);
+      }
+      const threads = await mongoStorage.searchThreads(q, parseInt(limit as string));
+      res.json(threads);
+    } catch (error) {
+      console.error("Search threads error:", error);
+      res.status(500).json({ message: "Failed to search threads" });
+    }
+  });
+
+  // Legacy chat endpoint for backward compatibility
   app.post('/api/chat', async (req, res) => {
     try {
       const { message, conversationId } = req.body;

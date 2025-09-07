@@ -15,6 +15,7 @@ export default function Landing() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [showChat, setShowChat] = useState(false);
+  const [currentThreadId, setCurrentThreadId] = useState(null);
   const { toast } = useToast();
   const messagesEndRef = useRef(null);
   const [, setLocation] = useLocation();
@@ -27,10 +28,17 @@ export default function Landing() {
     scrollToBottom();
   }, [messages]);
 
+  // Fetch recent chat threads
+  const { data: chatThreads = [], refetch: refetchThreads } = useQuery({
+    queryKey: ['/api/chat/threads'],
+    retry: false,
+  });
+
   const chatMutation = useMutation({
     mutationFn: async (message) => {
-      const response = await apiRequest("POST", "/api/chat", { 
-        message: message 
+      const response = await apiRequest("POST", "/api/chat/threads", { 
+        message: message,
+        threadId: currentThreadId
       });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -38,14 +46,22 @@ export default function Landing() {
       return await response.json();
     },
     onSuccess: (data, variables) => {
-      const aiMessage = {
-        id: Date.now() + 1,
-        type: "ai",
-        content: data.response,
-        sources: data.sources || [],
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, aiMessage]);
+      // Update current thread ID
+      setCurrentThreadId(data.threadId);
+      
+      // Set messages from thread data
+      if (data.thread && data.thread.messages) {
+        setMessages(data.thread.messages.map(msg => ({
+          id: msg.timestamp || Date.now(),
+          type: msg.type,
+          content: msg.content,
+          sources: msg.sources || [],
+          timestamp: new Date(msg.timestamp)
+        })));
+      }
+      
+      // Refresh threads list
+      refetchThreads();
     },
     onError: (error) => {
       toast({
@@ -79,6 +95,31 @@ export default function Landing() {
     }
   };
 
+  // Load specific thread
+  const loadThread = async (threadId) => {
+    try {
+      const response = await apiRequest("GET", `/api/chat/threads/${threadId}`);
+      if (response.ok) {
+        const thread = await response.json();
+        setCurrentThreadId(threadId);
+        setMessages(thread.messages.map(msg => ({
+          id: msg.timestamp || Date.now(),
+          type: msg.type,
+          content: msg.content,
+          sources: msg.sources || [],
+          timestamp: new Date(msg.timestamp)
+        })));
+        setShowChat(true);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load chat thread",
+        variant: "destructive",
+      });
+    }
+  };
+
   const suggestedQuestions = [
     "What are the latest AI developments?",
     "How does machine learning work?",
@@ -101,6 +142,7 @@ export default function Landing() {
             <Button 
               onClick={() => {
                 setMessages([]);
+                setCurrentThreadId(null);
                 setShowChat(false);
               }}
               className="w-full mb-4" 
@@ -112,10 +154,34 @@ export default function Landing() {
             </Button>
 
             <div className="space-y-2">
-              <div className="text-sm text-muted-foreground px-2 mb-2">Recent</div>
-              <div className="text-xs text-muted-foreground px-2">
-                Chat history will appear here
-              </div>
+              <div className="text-sm text-muted-foreground px-2 mb-2">Recent Chats</div>
+              {chatThreads && chatThreads.length > 0 ? (
+                chatThreads.map((thread) => (
+                  <Button
+                    key={thread.id}
+                    variant={currentThreadId === thread.id ? "secondary" : "ghost"}
+                    className="w-full justify-start h-auto p-3 text-left"
+                    onClick={() => loadThread(thread.id)}
+                    data-testid={`thread-${thread.id}`}
+                  >
+                    <div className="flex flex-col items-start w-full">
+                      <div className="font-medium text-sm truncate w-full">
+                        {thread.title}
+                      </div>
+                      <div className="text-xs text-muted-foreground truncate w-full">
+                        {thread.lastMessage}
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {new Date(thread.updatedAt).toLocaleDateString()}
+                      </div>
+                    </div>
+                  </Button>
+                ))
+              ) : (
+                <div className="text-xs text-muted-foreground px-2">
+                  No chat history yet
+                </div>
+              )}
             </div>
           </div>
 
@@ -124,7 +190,12 @@ export default function Landing() {
             {/* Header */}
             <div className="border-b p-4">
               <div className="flex items-center justify-between">
-                <h1 className="text-xl font-semibold">New Thread</h1>
+                <h1 className="text-xl font-semibold">
+                  {currentThreadId ? 
+                    (chatThreads.find(t => t.id === currentThreadId)?.title || "Chat Thread") :
+                    "New Thread"
+                  }
+                </h1>
                 <Button 
                   variant="ghost" 
                   size="sm"
