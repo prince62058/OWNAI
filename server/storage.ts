@@ -4,6 +4,8 @@ import {
   trendingTopics,
   spaces,
   searchHistory,
+  conversations,
+  messages,
   type User,
   type UpsertUser,
   type InsertSearch,
@@ -13,6 +15,10 @@ import {
   type InsertSpace,
   type Space,
   type SearchHistory,
+  type InsertConversation,
+  type Conversation,
+  type InsertMessage,
+  type Message,
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -28,6 +34,16 @@ export interface IStorage {
   getSearchesByUser(userId: string, limit?: number): Promise<Search[]>;
   getSearchHistory(userId: string, limit?: number): Promise<SearchHistory[]>;
   addToSearchHistory(userId: string, searchId: string): Promise<SearchHistory>;
+  
+  // Conversation operations
+  createConversation(conversation: InsertConversation): Promise<Conversation>;
+  getConversation(id: string): Promise<Conversation | undefined>;
+  getConversationsByUser(userId: string, limit?: number): Promise<Conversation[]>;
+  updateConversation(id: string, updates: Partial<Conversation>): Promise<Conversation>;
+  
+  // Message operations
+  createMessage(message: InsertMessage): Promise<Message>;
+  getMessagesByConversation(conversationId: string): Promise<Message[]>;
   
   // Trending topics operations
   getTrendingTopics(limit?: number): Promise<TrendingTopic[]>;
@@ -46,6 +62,8 @@ export class MemStorage implements IStorage {
   private trendingTopics: Map<string, TrendingTopic> = new Map();
   private spaces: Map<string, Space> = new Map();
   private searchHistoryRecords: Map<string, SearchHistory> = new Map();
+  private conversations: Map<string, Conversation> = new Map();
+  private messages: Map<string, Message> = new Map();
 
   constructor() {
     this.seedData();
@@ -282,6 +300,62 @@ export class MemStorage implements IStorage {
   async getSpacesByCategory(category: string): Promise<Space[]> {
     return Array.from(this.spaces.values())
       .filter(space => space.isActive && space.category === category);
+  }
+
+  // Conversation operations
+  async createConversation(conversationData: InsertConversation): Promise<Conversation> {
+    const id = randomUUID();
+    const conversation: Conversation = {
+      ...conversationData,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.conversations.set(id, conversation);
+    return conversation;
+  }
+
+  async getConversation(id: string): Promise<Conversation | undefined> {
+    return this.conversations.get(id);
+  }
+
+  async getConversationsByUser(userId: string, limit = 50): Promise<Conversation[]> {
+    return Array.from(this.conversations.values())
+      .filter(conv => conv.userId === userId)
+      .sort((a, b) => (b.updatedAt?.getTime() || 0) - (a.updatedAt?.getTime() || 0))
+      .slice(0, limit);
+  }
+
+  async updateConversation(id: string, updates: Partial<Conversation>): Promise<Conversation> {
+    const conversation = this.conversations.get(id);
+    if (!conversation) {
+      throw new Error('Conversation not found');
+    }
+    const updated = {
+      ...conversation,
+      ...updates,
+      updatedAt: new Date(),
+    };
+    this.conversations.set(id, updated);
+    return updated;
+  }
+
+  // Message operations
+  async createMessage(messageData: InsertMessage): Promise<Message> {
+    const id = randomUUID();
+    const message: Message = {
+      ...messageData,
+      id,
+      createdAt: new Date(),
+    };
+    this.messages.set(id, message);
+    return message;
+  }
+
+  async getMessagesByConversation(conversationId: string): Promise<Message[]> {
+    return Array.from(this.messages.values())
+      .filter(msg => msg.conversationId === conversationId)
+      .sort((a, b) => (a.createdAt?.getTime() || 0) - (b.createdAt?.getTime() || 0));
   }
 }
 

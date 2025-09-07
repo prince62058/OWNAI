@@ -29,8 +29,8 @@ export default function Landing() {
 
   const chatMutation = useMutation({
     mutationFn: async (message) => {
-      const response = await apiRequest("POST", "/api/search", { 
-        query: message 
+      const response = await apiRequest("POST", "/api/chat", { 
+        message: message 
       });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
