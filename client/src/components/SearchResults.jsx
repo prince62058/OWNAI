@@ -17,12 +17,10 @@ export default function SearchResults({
   const [displayedResponse, setDisplayedResponse] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Debug logs
-  console.log("SearchResults props:", { query, response, sources, isLoading, category });
+  // Debug logs removed for cleaner output
 
   // Typewriter effect for response
   useEffect(() => {
-    console.log("Response useEffect triggered:", { response, isLoading });
     if (response && !isLoading) {
       setDisplayedResponse("");
       setCurrentIndex(0);

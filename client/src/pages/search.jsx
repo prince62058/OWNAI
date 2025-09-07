@@ -30,13 +30,9 @@ export default function Search() {
       }
     },
     onSuccess: (data) => {
-      console.log("Search successful:", data); // Debug log
-      console.log("Response content:", data?.response); // Debug log
-      console.log("Sources count:", data?.sources?.length || 0); // Debug log
       setSearchData(data);
     },
     onError: (error) => {
-      console.error("Search failed:", error); // Debug log
       if (isUnauthorizedError(error)) {
         toast({
           title: "Unauthorized",
