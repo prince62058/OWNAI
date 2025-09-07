@@ -25,24 +25,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/search', async (req, res) => {
     try {
       const { query, category } = req.body;
-      
+
       if (!query) {
         return res.status(400).json({ message: "Query is required" });
       }
 
-      // Generate AI response
-      const aiResponse = await generateAIResponse(query, category);
-      
-      // Create search record
-      const searchData = {
-        userId: req.user?.claims?.sub || null,
-        query,
-        response: aiResponse.content,
-        category: category || null,
-        sources: aiResponse.sources,
-      };
+      console.log(`Processing search query: "${query}" with category: ${category}`);
 
-      const search = await storage.createSearch(searchData);
+      const aiResponse = await generateAIResponse(query, category);
+      console.log(`AI response generated:`, { 
+        contentLength: aiResponse.content?.length || 0, 
+        sourcesCount: aiResponse.sources?.length || 0 
+      });
+
+      // Ensure we have a valid response
+      if (!aiResponse.content) {
+        console.warn("No AI content generated, using fallback");
+        aiResponse.content = `I apologize, but I wasn't able to generate a response for "${query}". This might be due to configuration issues with the AI services. Please check the server logs or try again later.`;
+      }
+
+      const search = await storage.createSearch(query, aiResponse.content, category);
 
       // Add to user's search history if authenticated
       if (req.user?.claims?.sub) {
@@ -53,7 +55,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         searchId: search.id,
         query,
         response: aiResponse.content,
-        sources: aiResponse.sources,
+        sources: aiResponse.sources || [],
         category: category || null,
       });
     } catch (error) {
@@ -65,7 +67,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/search/suggestions', async (req, res) => {
     try {
       const { q } = req.query;
-      
+
       if (!q || typeof q !== 'string') {
         return res.json({ suggestions: [] });
       }
@@ -129,13 +131,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { category } = req.query;
       let spaces;
-      
+
       if (category && typeof category === 'string') {
         spaces = await storage.getSpacesByCategory(category);
       } else {
         spaces = await storage.getSpaces(10);
       }
-      
+
       res.json(spaces);
     } catch (error) {
       console.error("Get spaces error:", error);
