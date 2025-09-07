@@ -63,13 +63,10 @@ export default function Search() {
     const query = searchParams.get('q');
     const category = searchParams.get('category');
     
-    console.log("Search useEffect triggered:", { query, currentData: searchData?.query, location });
-    
-    if (query && query !== searchData?.query) {
-      console.log("Triggering search mutation for:", query);
-      searchMutation.mutate({ query, category: category || undefined });
+    if (query && query.trim() && query !== searchData?.query) {
+      searchMutation.mutate({ query: query.trim(), category: category || undefined });
     }
-  }, [location, searchData?.query, searchMutation]);
+  }, [location]);
 
   const currentQuery = new URLSearchParams(location.split('?')[1] || '').get('q') || '';
 
