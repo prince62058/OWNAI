@@ -1,6 +1,6 @@
 # Overview
 
-This is a modern AI-powered search and discovery platform built with React, TypeScript, and Express. The application provides an intelligent search experience with features like trending topics, categorized content, user spaces, and personalized search history. It's designed as a Perplexity-like interface where users can ask questions and receive AI-generated responses with cited sources.
+**PrinceTech AI** is a modern AI-powered search and discovery platform built with React, TypeScript, and Express. The application provides an intelligent search experience with features like trending topics, categorized content, user spaces, and personalized search history. It's designed as a Perplexity-like interface where users can ask questions and receive AI-generated responses with cited sources.
 
 # User Preferences
 

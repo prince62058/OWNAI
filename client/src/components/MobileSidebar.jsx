@@ -46,9 +46,9 @@ export default function MobileSidebar({ onClose }) {
       <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center space-x-2">
           <div className="w-8 h-8 rounded-lg flex items-center justify-center">
-            <img src="/ft-logo.png" alt="FrienchTech.Ai" className="w-8 h-8 rounded-lg object-contain" />
+            <img src="/ft-logo.png" alt="PrinceTech AI" className="w-8 h-8 rounded-lg object-contain" />
           </div>
-          <span className="text-lg font-bold gradient-text">FrienchTech.Ai</span>
+          <span className="text-lg font-bold gradient-text">PrinceTech AI</span>
         </div>
         <button
           onClick={onClose}

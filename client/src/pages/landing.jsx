@@ -48,9 +48,9 @@ export default function Landing() {
           <div className="container mx-auto max-w-4xl text-center">
             <div className="fade-in">
               <div className="flex justify-center items-center mb-8 w-full">
-                <img src="/ft-logo.png" alt="FrienchTech.Ai" className="w-16 h-16 object-contain mx-auto" />
+                <img src="/ft-logo.png" alt="PrinceTech AI" className="w-16 h-16 object-contain mx-auto" />
               </div>
-              <h1 className="sm:text-5xl lg:text-6xl mb-6 font-light text-[58px]" data-testid="hero-title">FrienchTech</h1>
+              <h1 className="sm:text-5xl lg:text-6xl mb-6 font-light text-[58px]" data-testid="hero-title">PrinceTech AI</h1>
               <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto" data-testid="hero-description">
                 Ask anything and get instant, accurate answers with cited sources. 
                 Powered by advanced AI and real-time web search.
@@ -171,7 +171,7 @@ export default function Landing() {
                 <div className="relative mb-8 flex justify-center">
                   <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center shadow-lg backdrop-blur-sm border border-primary/10">
                     <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center p-2">
-                      <img src="/ft-logo-signin.png" alt="FrienchTech.Ai" className="w-full h-full object-contain" />
+                      <img src="/ft-logo-signin.png" alt="PrinceTech AI" className="w-full h-full object-contain" />
                     </div>
                   </div>
                 </div>
