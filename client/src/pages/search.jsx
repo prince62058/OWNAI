@@ -16,13 +16,25 @@ export default function Search() {
 
   const searchMutation = useMutation({
     mutationFn: async ({ query, category }) => {
-      const response = await apiRequest("POST", "/api/search", { query, category });
-      return response.json();
+      try {
+        const response = await apiRequest("POST", "/api/search", { query, category });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log("Search response:", data); // Debug log
+        return data;
+      } catch (error) {
+        console.error("Search mutation error:", error);
+        throw error;
+      }
     },
     onSuccess: (data) => {
+      console.log("Search successful:", data); // Debug log
       setSearchData(data);
     },
     onError: (error) => {
+      console.error("Search failed:", error); // Debug log
       if (isUnauthorizedError(error)) {
         toast({
           title: "Unauthorized",
@@ -37,7 +49,7 @@ export default function Search() {
       
       toast({
         title: "Search Failed",
-        description: "Unable to process your search. Please try again.",
+        description: error.message || "Unable to process your search. Please try again.",
         variant: "destructive",
       });
     },

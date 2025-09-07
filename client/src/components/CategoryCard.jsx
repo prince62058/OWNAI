@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
-import { ArrowRight, DollarSign, Plane, ShoppingBag, GraduationCap } from "lucide-react";
+import { ArrowRight, DollarSign, Plane, ShoppingBag, GraduationCap, ArrowUpRight } from "lucide-react";
 import { Link } from "wouter";
+import { Button } from "@/components/ui/button";
 
 const colorClasses = {
   green: "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400",
@@ -17,23 +18,35 @@ const iconComponents = {
 };
 
 export default function CategoryCard({ id, name, description, icon, color, href }) {
-  const iconColorClass = colorClasses[color] || colorClasses.blue;
   const IconComponent = iconComponents[icon] || DollarSign;
+  const Icon = IconComponent; // Alias for clarity in the changes.
+
+  // The original code had a Link wrapping the Card, and another Link inside for the button.
+  // This resulted in nested anchor tags, which is invalid HTML and can cause issues.
+  // The fix involves removing the outer Link and ensuring the inner Link is correctly placed within the Card.
 
   return (
-    <Link href={href} data-testid={`category-${id}`}>
-      <a>
-        <Card className="category-card rounded-2xl p-6 group cursor-pointer">
-          <div className="flex items-center justify-between mb-4">
-            <div className={`w-12 h-12 ${iconColorClass} rounded-xl flex items-center justify-center`}>
-              <IconComponent className="h-6 w-6" />
+      <Card className="group p-6 hover:shadow-lg transition-all duration-300 cursor-pointer border border-border/50 hover:border-primary/20">
+        <div className="flex items-start justify-between">
+          <div className="flex items-start space-x-4">
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center bg-${color}-100 dark:bg-${color}-900/20`}>
+              <Icon className={`h-6 w-6 text-${color}-600 dark:text-${color}-400`} />
             </div>
-            <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+            <div className="flex-1">
+              <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors" data-testid={`category-title-${id}`}>
+                {name}
+              </h3>
+              <p className="text-muted-foreground text-sm leading-relaxed mb-4" data-testid={`category-description-${id}`}>
+                {description}
+              </p>
+              <Link href={href}>
+                <Button variant="outline" size="sm" className="mt-2">
+                  Explore {name} <ArrowUpRight className="ml-2 h-3 w-3" />
+                </Button>
+              </Link>
+            </div>
           </div>
-          <h3 className="text-lg font-semibold mb-2" data-testid={`category-title-${id}`}>{name}</h3>
-          <p className="text-muted-foreground text-sm" data-testid={`category-description-${id}`}>{description}</p>
-        </Card>
-      </a>
-    </Link>
+        </div>
+      </Card>
   );
 }

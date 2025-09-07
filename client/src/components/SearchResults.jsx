@@ -23,19 +23,25 @@ export default function SearchResults({
       setDisplayedResponse("");
       setCurrentIndex(0);
       
-      const timer = setInterval(() => {
-        setCurrentIndex((prev) => {
-          if (prev < response.length) {
-            setDisplayedResponse(response.slice(0, prev + 1));
-            return prev + 1;
-          } else {
-            clearInterval(timer);
-            return prev;
-          }
-        });
-      }, 20);
+      // Show response immediately if it's short, otherwise use typewriter effect
+      if (response.length < 100) {
+        setDisplayedResponse(response);
+        setCurrentIndex(response.length);
+      } else {
+        const timer = setInterval(() => {
+          setCurrentIndex((prev) => {
+            if (prev < response.length) {
+              setDisplayedResponse(response.slice(0, prev + 1));
+              return prev + 1;
+            } else {
+              clearInterval(timer);
+              return prev;
+            }
+          });
+        }, 20);
 
-      return () => clearInterval(timer);
+        return () => clearInterval(timer);
+      }
     }
   }, [response, isLoading]);
 
