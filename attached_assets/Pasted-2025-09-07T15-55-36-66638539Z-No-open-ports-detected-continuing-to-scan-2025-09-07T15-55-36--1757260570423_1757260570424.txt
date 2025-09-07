@@ -1,0 +1,61 @@
+2025-09-07T15:55:36.66638539Z ==> No open ports detected, continuing to scan...
+2025-09-07T15:55:36.839292159Z ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+2025-09-07T15:55:40.785285474Z ❌ MongoDB connection error: MongooseServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-09-07T15:55:40.785320405Z     at _handleConnectionErrors (/opt/render/project/src/node_modules/mongoose/lib/connection.js:1165:11)
+2025-09-07T15:55:40.785362908Z     at NativeConnection.openUri (/opt/render/project/src/node_modules/mongoose/lib/connection.js:1096:11)
+2025-09-07T15:55:40.785368088Z     at async connectMongoDB (file:///opt/render/project/src/dist/index.js:718:5)
+2025-09-07T15:55:40.785372188Z     at async file:///opt/render/project/src/dist/index.js:1357:3 {
+2025-09-07T15:55:40.785376828Z   errorLabelSet: Set(0) {},
+2025-09-07T15:55:40.785380419Z   reason: TopologyDescription {
+2025-09-07T15:55:40.785384509Z     type: 'Unknown',
+2025-09-07T15:55:40.785388399Z     servers: Map(1) { 'localhost:27017' => [ServerDescription] },
+2025-09-07T15:55:40.785392049Z     stale: false,
+2025-09-07T15:55:40.785395699Z     compatible: true,
+2025-09-07T15:55:40.785399249Z     heartbeatFrequencyMS: 10000,
+2025-09-07T15:55:40.78540292Z     localThresholdMS: 15,
+2025-09-07T15:55:40.78540666Z     setName: null,
+2025-09-07T15:55:40.78541038Z     maxElectionId: null,
+2025-09-07T15:55:40.78541409Z     maxSetVersion: null,
+2025-09-07T15:55:40.785417621Z     commonWireVersion: 0,
+2025-09-07T15:55:40.785422171Z     logicalSessionTimeoutMinutes: null
+2025-09-07T15:55:40.785425911Z   },
+2025-09-07T15:55:40.785430131Z   code: undefined,
+2025-09-07T15:55:40.785433942Z   cause: TopologyDescription {
+2025-09-07T15:55:40.785437622Z     type: 'Unknown',
+2025-09-07T15:55:40.785441492Z     servers: Map(1) { 'localhost:27017' => [ServerDescription] },
+2025-09-07T15:55:40.785445292Z     stale: false,
+2025-09-07T15:55:40.785448942Z     compatible: true,
+2025-09-07T15:55:40.785452712Z     heartbeatFrequencyMS: 10000,
+2025-09-07T15:55:40.785456473Z     localThresholdMS: 15,
+2025-09-07T15:55:40.785460113Z     setName: null,
+2025-09-07T15:55:40.785463833Z     maxElectionId: null,
+2025-09-07T15:55:40.785467413Z     maxSetVersion: null,
+2025-09-07T15:55:40.785471244Z     commonWireVersion: 0,
+2025-09-07T15:55:40.785475134Z     logicalSessionTimeoutMinutes: null
+2025-09-07T15:55:40.785478834Z   }
+2025-09-07T15:55:40.785482474Z }
+2025-09-07T15:55:41.488978571Z file:///opt/render/project/src/node_modules/openid-client/build/index.js:89
+2025-09-07T15:55:41.489004202Z     const err = new TypeError(message, { cause });
+2025-09-07T15:55:41.489009373Z                 ^
+2025-09-07T15:55:41.489013303Z 
+2025-09-07T15:55:41.489017923Z TypeError: "clientId" must be a non-empty string
+2025-09-07T15:55:41.489022554Z     at CodedTypeError (file:///opt/render/project/src/node_modules/openid-client/build/index.js:89:17)
+2025-09-07T15:55:41.489027584Z     at new Configuration (file:///opt/render/project/src/node_modules/openid-client/build/index.js:463:19)
+2025-09-07T15:55:41.489031744Z     at Module.discovery (file:///opt/render/project/src/node_modules/openid-client/build/index.js:244:22)
+2025-09-07T15:55:41.489036364Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-09-07T15:55:41.489040544Z     at async memoize.maxAge (file:///opt/render/project/src/dist/index.js:281:12)
+2025-09-07T15:55:41.489044685Z     at async setupAuth (file:///opt/render/project/src/dist/index.js:330:18)
+2025-09-07T15:55:41.489072576Z     at async registerRoutes (file:///opt/render/project/src/dist/index.js:828:3)
+2025-09-07T15:55:41.489075246Z     at async file:///opt/render/project/src/dist/index.js:1358:18 {
+2025-09-07T15:55:41.489078477Z   code: 'ERR_INVALID_ARG_TYPE',
+2025-09-07T15:55:41.489081067Z   [cause]: undefined
+2025-09-07T15:55:41.489083767Z }
+2025-09-07T15:55:41.489085817Z 
+2025-09-07T15:55:41.489088137Z Node.js v22.16.0
+2025-09-07T15:55:42.503534393Z ==> Exited with status 1
+2025-09-07T15:55:42.519625133Z ==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
+2025-09-07T15:55:47.963077383Z ==> Running 'npm run start'
+2025-09-07T15:55:51.851376116Z 
+2025-09-07T15:55:51.851397617Z > rest-express@1.0.0 start
+2025-09-07T15:55:51.851401957Z > NODE_ENV=production node dist/index.js
+2025-09-07T15:55:51.851404397Z 
