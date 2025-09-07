@@ -8,7 +8,8 @@ import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
 
-if (!process.env.REPLIT_DOMAINS) {
+const domains = process.env.REPLIT_DOMAINS;
+if (!domains && process.env.NODE_ENV !== "production") {
   throw new Error("Environment variable REPLIT_DOMAINS not provided");
 }
 
@@ -31,10 +32,10 @@ export function getSession() {
     ttl: sessionTtl,
     tableName: "sessions",
   });
-  
+
   // Generate a secure session secret if not provided
   const sessionSecret = process.env.SESSION_SECRET || 'dev-session-secret-' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-  
+
   return session({
     secret: sessionSecret,
     store: sessionStore,
@@ -88,8 +89,8 @@ export async function setupAuth(app: Express) {
     verified(null, user);
   };
 
-  for (const domain of process.env
-    .REPLIT_DOMAINS!.split(",")) {
+  const allowedOrigins = domains ? domains.split(",").map(domain => domain.trim()) : [];
+  for (const domain of allowedOrigins) {
     const strategy = new Strategy(
       {
         name: `replitauth:${domain}`,

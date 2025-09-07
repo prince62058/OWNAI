@@ -54,7 +54,7 @@ export default function Landing() {
     onSuccess: (data, variables) => {
       // Update current thread ID
       setCurrentThreadId(data.threadId);
-      
+
       // Set messages from thread data
       if (data.thread && data.thread.messages) {
         setMessages(data.thread.messages.map((msg, index) => ({
@@ -65,7 +65,7 @@ export default function Landing() {
           timestamp: new Date(msg.timestamp)
         })));
       }
-      
+
       // Refresh threads list
       refetchThreads();
     },
@@ -129,7 +129,7 @@ export default function Landing() {
   // Delete thread function
   const deleteThread = async (threadId, e) => {
     e.stopPropagation(); // Prevent thread loading when delete is clicked
-    
+
     try {
       const response = await apiRequest("DELETE", `/api/chat/threads/${threadId}`);
       if (response.ok) {
@@ -139,10 +139,10 @@ export default function Landing() {
           setMessages([]);
           setShowChat(false);
         }
-        
+
         // Refresh threads list
         refetchThreads();
-        
+
         toast({
           title: "Success",
           description: "Chat thread deleted successfully",
@@ -175,7 +175,7 @@ export default function Landing() {
                 <MessageSquare className="w-4 h-4 text-white" />
               </div>
             </div>
-            
+
             <Button 
               onClick={() => {
                 setMessages([]);
@@ -213,7 +213,7 @@ export default function Landing() {
                         </div>
                       </div>
                     </Button>
-                    
+
                     <div className="absolute right-2 top-3 opacity-0 group-hover:opacity-100 transition-opacity">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -299,7 +299,7 @@ export default function Landing() {
                                 )}
                               </AvatarFallback>
                             </Avatar>
-                            
+
                             <div className="flex-1 min-w-0">
                               <div className="mb-2">
                                 <span className="font-medium text-sm">
@@ -312,11 +312,11 @@ export default function Landing() {
                                   })}
                                 </span>
                               </div>
-                              
+
                               <div className="prose prose-sm max-w-none dark:prose-invert">
                                 <p className="whitespace-pre-wrap break-words">{message.content}</p>
                               </div>
-                              
+
                               {/* Sources */}
                               {message.type === "ai" && message.sources && message.sources.length > 0 && (
                                 <div className="mt-4 pt-4 border-t">
@@ -350,7 +350,7 @@ export default function Landing() {
                           </div>
                         </div>
                       ))}
-                      
+
                       {/* Loading indicator */}
                       {chatMutation.isPending && (
                         <div className="group">
@@ -373,7 +373,7 @@ export default function Landing() {
                           </div>
                         </div>
                       )}
-                      
+
                       <div ref={messagesEndRef} />
                     </div>
                   )}
@@ -436,9 +436,9 @@ export default function Landing() {
                   <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
                     <MessageSquare className="w-4 h-4 text-white" />
                   </div>
-                  
+
                 </div>
-                
+
                 <nav className="hidden md:flex items-center gap-6">
                   <a href="#" className="text-sm text-muted-foreground hover:text-foreground">Discover</a>
                   <a href="#" className="text-sm text-muted-foreground hover:text-foreground">Library</a>
@@ -515,7 +515,7 @@ export default function Landing() {
                 <h3 className="font-semibold mb-2">Real-time Search</h3>
                 <p className="text-sm text-muted-foreground">Get up-to-date information from across the web with comprehensive source citations.</p>
               </div>
-              
+
               <div className="text-center bg-background/60 backdrop-blur-sm rounded-xl p-6 border border-muted/30">
                 <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/20 rounded-xl flex items-center justify-center mx-auto mb-4">
                   <Bot className="w-6 h-6 text-purple-600" />
@@ -523,7 +523,7 @@ export default function Landing() {
                 <h3 className="font-semibold mb-2">AI-Powered</h3>
                 <p className="text-sm text-muted-foreground">Advanced AI understands context and provides detailed, accurate responses.</p>
               </div>
-              
+
               <div className="text-center bg-background/60 backdrop-blur-sm rounded-xl p-6 border border-muted/30">
                 <div className="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-xl flex items-center justify-center mx-auto mb-4">
                   <Library className="w-6 h-6 text-green-600" />
