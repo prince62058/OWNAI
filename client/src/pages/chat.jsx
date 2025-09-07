@@ -16,7 +16,7 @@ export default function Chat() {
     {
       id: 1,
       type: "ai",
-      content: "नमस्ते! मैं आपका AI असिस्टेंट हूं। आप मुझसे कुछ भी पूछ सकते हैं।",
+      content: "Hello! I'm your AI assistant. You can ask me anything!",
       timestamp: new Date()
     }
   ]);
@@ -55,7 +55,7 @@ export default function Chat() {
     onError: (error) => {
       toast({
         title: "Error",
-        description: "कुछ गलत हुआ है। कृपया दोबारा कोशिश करें।",
+        description: "Something went wrong. Please try again.",
         variant: "destructive",
       });
     },
@@ -92,7 +92,7 @@ export default function Chat() {
           {/* Chat Header */}
           <div className="mb-4">
             <h1 className="text-2xl font-bold">AI Chat</h1>
-            <p className="text-muted-foreground">अपने AI असिस्टेंट से बात करें</p>
+            <p className="text-muted-foreground">Chat with your AI assistant</p>
           </div>
 
           {/* Messages Area */}
@@ -186,7 +186,7 @@ export default function Chat() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="कुछ भी पूछें..."
+              placeholder="Ask me anything..."
               disabled={chatMutation.isPending}
               className="flex-1"
               data-testid="chat-input"
