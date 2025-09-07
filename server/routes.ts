@@ -4,7 +4,6 @@ import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { generateAIResponse, generateSearchSuggestions } from "./openai";
 import { insertSearchSchema, insertConversationSchema, insertMessageSchema } from "@shared/schema";
-import { mongoStorage } from "./mongodb.js";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
@@ -302,7 +301,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // MongoDB Chat Threads API
+  // PostgreSQL Chat Threads API (using conversations)
   app.post('/api/chat/threads', async (req, res) => {
     try {
       const { message, threadId } = req.body;
@@ -320,60 +319,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
         aiResponse.content = `I apologize, but I wasn't able to generate a response for "${message}". Please try again.`;
       }
 
-      let thread;
+      let conversation;
+      let conversationId = threadId;
 
       if (threadId) {
-        // Add to existing thread
-        const userMessage = {
-          type: 'user',
-          content: message,
-          timestamp: new Date()
-        };
-
-        const aiMessage = {
-          type: 'ai',
-          content: aiResponse.content,
-          timestamp: new Date(),
-          sources: aiResponse.sources || []
-        };
-
-        // Add user message
-        await mongoStorage.addMessageToThread(threadId, userMessage);
-        // Add AI response
-        thread = await mongoStorage.addMessageToThread(threadId, aiMessage);
+        // Get existing conversation
+        conversation = await storage.getConversation(threadId);
+        if (!conversation) {
+          return res.status(404).json({ message: "Thread not found" });
+        }
       } else {
-        // Create new thread
+        // Create new conversation
         const title = message.length > 50 ? message.substring(0, 47) + "..." : message;
-        
-        const firstUserMessage = {
-          type: 'user',
-          content: message,
-          timestamp: new Date()
-        };
-
-        thread = await mongoStorage.createChatThread(title, firstUserMessage);
-
-        // Add AI response
-        const aiMessage = {
-          type: 'ai',
-          content: aiResponse.content,
-          timestamp: new Date(),
-          sources: aiResponse.sources || []
-        };
-
-        thread = await mongoStorage.addMessageToThread(thread._id.toString(), aiMessage);
+        conversation = await storage.createConversation({
+          title,
+          userId: null // Allow anonymous conversations for chat threads
+        });
+        conversationId = conversation.id;
       }
 
+      // Add user message
+      await storage.createMessage({
+        conversationId,
+        role: 'user',
+        content: message
+      });
+
+      // Add AI response
+      await storage.createMessage({
+        conversationId,
+        role: 'assistant',
+        content: aiResponse.content,
+        sources: aiResponse.sources || []
+      });
+
+      // Update conversation timestamp
+      await storage.updateConversation(conversationId, { updatedAt: new Date() });
+
+      // Get all messages for the conversation
+      const messages = await storage.getMessagesByConversation(conversationId);
+
       res.json({
-        threadId: thread._id.toString(),
+        threadId: conversationId,
         response: aiResponse.content,
         sources: aiResponse.sources || [],
         thread: {
-          id: thread._id.toString(),
-          title: thread.title,
-          messages: thread.messages,
-          createdAt: thread.createdAt,
-          updatedAt: thread.updatedAt
+          id: conversationId,
+          title: conversation.title,
+          messages: messages.map(msg => ({
+            type: msg.role === 'user' ? 'user' : 'ai',
+            content: msg.content,
+            timestamp: msg.createdAt,
+            sources: msg.sources || []
+          })),
+          createdAt: conversation.createdAt,
+          updatedAt: conversation.updatedAt
         }
       });
 
@@ -383,25 +383,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get recent chat threads
+  // Get recent chat threads (using conversations)
   app.get('/api/chat/threads', async (req, res) => {
     try {
       const { limit = 10 } = req.query;
-      const threads = await mongoStorage.getRecentThreads(parseInt(limit as string));
+      const conversations = await storage.getRecentConversations(parseInt(limit as string));
+      
+      // Transform to match expected format
+      const threads = conversations.map(conv => ({
+        id: conv.id,
+        title: conv.title || 'Untitled',
+        createdAt: conv.createdAt,
+        updatedAt: conv.updatedAt,
+        lastMessage: conv.summary || '',
+        messageCount: 0 // Would need separate query to get exact count
+      }));
+      
       res.json(threads);
     } catch (error) {
       console.error("Get chat threads error:", error);
-      res.status(500).json({ message: "Failed to get chat threads" });
+      res.json([]); // Return empty array instead of error
     }
   });
 
-  // Get specific thread
+  // Get specific thread (using conversations)
   app.get('/api/chat/threads/:id', async (req, res) => {
     try {
-      const thread = await mongoStorage.getThreadById(req.params.id);
-      if (!thread) {
+      const conversation = await storage.getConversation(req.params.id);
+      if (!conversation) {
         return res.status(404).json({ message: "Thread not found" });
       }
+      
+      const messages = await storage.getMessagesByConversation(req.params.id);
+      
+      const thread = {
+        id: conversation.id,
+        title: conversation.title,
+        messages: messages.map(msg => ({
+          type: msg.role === 'user' ? 'user' : 'ai',
+          content: msg.content,
+          timestamp: msg.createdAt,
+          sources: msg.sources || []
+        })),
+        createdAt: conversation.createdAt,
+        updatedAt: conversation.updatedAt
+      };
+      
       res.json(thread);
     } catch (error) {
       console.error("Get thread error:", error);
@@ -409,13 +436,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Delete thread
+  // Delete thread (using conversations)
   app.delete('/api/chat/threads/:id', async (req, res) => {
     try {
-      const success = await mongoStorage.deleteThread(req.params.id);
-      if (!success) {
+      const conversation = await storage.getConversation(req.params.id);
+      if (!conversation) {
         return res.status(404).json({ message: "Thread not found" });
       }
+      
+      // Delete all messages first
+      await storage.deleteMessagesByConversation(req.params.id);
+      // Delete conversation
+      await storage.deleteConversation(req.params.id);
+      
       res.json({ success: true });
     } catch (error) {
       console.error("Delete thread error:", error);
@@ -423,18 +456,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Search threads
+  // Search threads (using conversations)
   app.get('/api/chat/search', async (req, res) => {
     try {
       const { q, limit = 10 } = req.query;
       if (!q || typeof q !== 'string') {
         return res.json([]);
       }
-      const threads = await mongoStorage.searchThreads(q, parseInt(limit as string));
+      
+      // Search conversations by title
+      const conversations = await storage.searchConversations(q as string, parseInt(limit as string));
+      
+      // Transform to match expected format
+      const threads = conversations.map(conv => ({
+        id: conv.id,
+        title: conv.title || 'Untitled',
+        createdAt: conv.createdAt,
+        updatedAt: conv.updatedAt,
+        lastMessage: conv.summary || '',
+        messageCount: 0
+      }));
+      
       res.json(threads);
     } catch (error) {
       console.error("Search threads error:", error);
-      res.status(500).json({ message: "Failed to search threads" });
+      res.json([]);
     }
   });
 

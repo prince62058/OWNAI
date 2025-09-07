@@ -39,11 +39,15 @@ export interface IStorage {
   createConversation(conversation: InsertConversation): Promise<Conversation>;
   getConversation(id: string): Promise<Conversation | undefined>;
   getConversationsByUser(userId: string, limit?: number): Promise<Conversation[]>;
+  getRecentConversations(limit?: number): Promise<Conversation[]>;
   updateConversation(id: string, updates: Partial<Conversation>): Promise<Conversation>;
+  deleteConversation(id: string): Promise<void>;
+  searchConversations(query: string, limit?: number): Promise<Conversation[]>;
   
   // Message operations
   createMessage(message: InsertMessage): Promise<Message>;
   getMessagesByConversation(conversationId: string): Promise<Message[]>;
+  deleteMessagesByConversation(conversationId: string): Promise<void>;
   
   // Trending topics operations
   getTrendingTopics(limit?: number): Promise<TrendingTopic[]>;
@@ -340,6 +344,27 @@ export class MemStorage implements IStorage {
     return updated;
   }
 
+  async getRecentConversations(limit = 50): Promise<Conversation[]> {
+    return Array.from(this.conversations.values())
+      .sort((a, b) => (b.updatedAt?.getTime() || 0) - (a.updatedAt?.getTime() || 0))
+      .slice(0, limit);
+  }
+
+  async deleteConversation(id: string): Promise<void> {
+    this.conversations.delete(id);
+  }
+
+  async searchConversations(query: string, limit = 50): Promise<Conversation[]> {
+    const lowerQuery = query.toLowerCase();
+    return Array.from(this.conversations.values())
+      .filter(conv => 
+        conv.title?.toLowerCase().includes(lowerQuery) ||
+        conv.summary?.toLowerCase().includes(lowerQuery)
+      )
+      .sort((a, b) => (b.updatedAt?.getTime() || 0) - (a.updatedAt?.getTime() || 0))
+      .slice(0, limit);
+  }
+
   // Message operations
   async createMessage(messageData: InsertMessage): Promise<Message> {
     const id = randomUUID();
@@ -356,6 +381,14 @@ export class MemStorage implements IStorage {
     return Array.from(this.messages.values())
       .filter(msg => msg.conversationId === conversationId)
       .sort((a, b) => (a.createdAt?.getTime() || 0) - (b.createdAt?.getTime() || 0));
+  }
+
+  async deleteMessagesByConversation(conversationId: string): Promise<void> {
+    const messageIds = Array.from(this.messages.entries())
+      .filter(([_, msg]) => msg.conversationId === conversationId)
+      .map(([id, _]) => id);
+    
+    messageIds.forEach(id => this.messages.delete(id));
   }
 }
 
