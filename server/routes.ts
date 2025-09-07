@@ -12,7 +12,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = (req.user as any).claims.sub;
       const user = await storage.getUser(userId);
       res.json(user);
     } catch (error) {
@@ -49,12 +49,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         response: aiResponse.content,
         category: category || null,
         sources: aiResponse.sources,
-        userId: req.user?.claims?.sub || null,
+        userId: (req.user as any)?.claims?.sub || null,
       });
 
       // Add to user's search history if authenticated
-      if (req.user?.claims?.sub) {
-        await storage.addToSearchHistory(req.user.claims.sub, search.id);
+      if ((req.user as any)?.claims?.sub) {
+        await storage.addToSearchHistory((req.user as any).claims.sub, search.id);
       }
 
       res.json({
@@ -102,7 +102,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User search history
   app.get('/api/search/history', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = (req.user as any).claims.sub;
       const searches = await storage.getSearchesByUser(userId, 50);
       res.json(searches);
     } catch (error) {
@@ -198,7 +198,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Conversation routes
   app.post('/api/conversations', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = (req.user as any).claims.sub;
       const validation = insertConversationSchema.safeParse(req.body);
       
       if (!validation.success) {
@@ -238,7 +238,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Check if user owns this conversation
-      if (conversation.userId !== req.user.claims.sub) {
+      if (conversation.userId !== (req.user as any).claims.sub) {
         return res.status(403).json({ message: "Access denied" });
       }
 
@@ -253,7 +253,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/conversations/:id/messages', isAuthenticated, async (req: any, res) => {
     try {
       const { id: conversationId } = req.params;
-      const userId = req.user.claims.sub;
+      const userId = (req.user as any).claims.sub;
 
       // Verify conversation exists and user owns it
       const conversation = await storage.getConversation(conversationId);
@@ -285,7 +285,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/conversations/:id/messages', isAuthenticated, async (req: any, res) => {
     try {
       const { id: conversationId } = req.params;
-      const userId = req.user.claims.sub;
+      const userId = (req.user as any).claims.sub;
 
       // Verify conversation exists and user owns it
       const conversation = await storage.getConversation(conversationId);
@@ -313,9 +313,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let convId = conversationId;
       
       // If authenticated and no conversation ID, create a new conversation
-      if (req.user?.claims?.sub && !convId) {
+      if ((req.user as any)?.claims?.sub && !convId) {
         const conversation = await storage.createConversation({
-          userId: req.user.claims.sub,
+          userId: (req.user as any).claims.sub,
           title: message.length > 50 ? message.substring(0, 50) + "..." : message,
         });
         convId = conversation.id;

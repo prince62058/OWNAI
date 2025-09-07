@@ -306,7 +306,7 @@ export default function Landing() {
         <main className="max-w-4xl mx-auto px-4 py-16">
           <div className="text-center mb-12">
             <h1 className="text-5xl font-light mb-6" data-testid="hero-title">
-              Where knowledge begins
+              PrinceTech AI
             </h1>
             <p className="text-xl text-muted-foreground mb-8" data-testid="hero-subtitle">
               Ask anything and get instant, accurate answers with cited sources
