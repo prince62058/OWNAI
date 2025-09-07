@@ -101,10 +101,11 @@ export async function generateAIResponse(query: string, category?: string): Prom
     }
   }
 
-  // Final fallback if neither service is available
+  // Enhanced fallback with useful content based on query
+  const fallbackContent = generateFallbackResponse(query, category);
   return {
-    content: "AI search is currently unavailable. Please configure a Google API key or OpenAI API key to enable AI-powered responses.",
-    sources: []
+    content: fallbackContent.content,
+    sources: fallbackContent.sources
   };
 }
 
