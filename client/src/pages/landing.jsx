@@ -60,14 +60,14 @@ export default function Landing() {
             <div className="fade-in">
               <h1 className="text-4xl sm:text-6xl lg:text-7xl mb-4 font-light leading-tight" data-testid="hero-title">
                 <span className="text-white">Hi, I'm </span>
-                <span className="text-yellow-400 font-medium">PrinceTech</span>
+                <span className="text-cyan-400 font-medium">PrinceTech</span>
                 <br />
-                <span className="text-yellow-400 font-medium">AI</span>
+                <span className="text-blue-400 font-medium">AI</span>
               </h1>
-              <p className="text-xl text-yellow-400/90 mb-8 font-medium tracking-wide" data-testid="hero-subtitle">
+              <p className="text-xl text-cyan-300/90 mb-8 font-medium tracking-wide" data-testid="hero-subtitle">
                 AI/ML Enthusiast
               </p>
-              <p className="text-lg text-white/70 mb-12 max-w-2xl mx-auto leading-relaxed" data-testid="hero-description">
+              <p className="text-lg text-blue-200/70 mb-12 max-w-2xl mx-auto leading-relaxed" data-testid="hero-description">
                 Ask anything and get instant, accurate answers with cited sources. 
                 Powered by advanced AI and real-time web search.
               </p>
