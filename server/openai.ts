@@ -3,7 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Initialize Google Gemini AI as primary service
 const geminiAPI = process.env.GOOGLE_API_KEY ? new GoogleGenerativeAI(process.env.GOOGLE_API_KEY) : null;
-const gemini = geminiAPI ? geminiAPI.getGenerativeModel({ model: "gemini-1.5-pro" }) : null;
+const gemini = geminiAPI ? geminiAPI.getGenerativeModel({ model: "gemini-1.5-flash" }) : null;
 
 // Fallback to OpenAI if Gemini is not available
 const openai = process.env.OPENAI_API_KEY || process.env.OPENAI_KEY || process.env.API_KEY 
@@ -55,15 +55,18 @@ export async function generateAIResponse(query: string, category?: string): Prom
       const text = response.text();
       
       try {
-        const parsed = JSON.parse(text);
+        // Clean the text by removing markdown code blocks
+        const cleanText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        const parsed = JSON.parse(cleanText);
         return {
           content: parsed.content || "I'm sorry, I couldn't generate a response to your query.",
           sources: parsed.sources || []
         };
       } catch {
-        // If JSON parsing fails, return the raw text as content
+        // If JSON parsing fails, return the cleaned text as content
+        const cleanContent = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
         return {
-          content: text,
+          content: cleanContent,
           sources: []
         };
       }
@@ -126,11 +129,25 @@ export async function generateSearchSuggestions(query: string): Promise<string[]
       const text = response.text();
       
       try {
-        const parsed = JSON.parse(text);
-        return Array.isArray(parsed) ? parsed : [];
+        // Clean the text by removing markdown code blocks and extra formatting
+        const cleanText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        const parsed = JSON.parse(cleanText);
+        return Array.isArray(parsed) ? parsed : (parsed.suggestions || []);
       } catch {
         // If JSON parsing fails, extract suggestions manually
-        const lines = text.split('\n').filter(line => line.trim().length > 0);
+        const cleanText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        // Try to extract array-like content
+        if (cleanText.includes('[') && cleanText.includes(']')) {
+          try {
+            const arrayMatch = cleanText.match(/\[.*\]/s);
+            if (arrayMatch) {
+              const parsed = JSON.parse(arrayMatch[0]);
+              return Array.isArray(parsed) ? parsed : [];
+            }
+          } catch {}
+        }
+        // Final fallback - split by lines
+        const lines = cleanText.split('\n').filter(line => line.trim().length > 0);
         return lines.slice(0, 3);
       }
     } catch (error) {
