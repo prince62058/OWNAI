@@ -1,14 +1,14 @@
 import { Link, useLocation } from "wouter";
-import { Home, Compass, Grid3X3, Bookmark } from "lucide-react";
+import { Home, MessageCircle, Compass, Grid3X3, Bookmark } from "lucide-react";
 
 export default function MobileNav() {
   const [location] = useLocation();
 
   const navItems = [
     { label: "Home", href: "/", icon: Home },
+    { label: "Chat", href: "/chat", icon: MessageCircle },
     { label: "Discover", href: "/discover", icon: Compass },
     { label: "Spaces", href: "/spaces", icon: Grid3X3 },
-    { label: "Library", href: "/library", icon: Bookmark },
   ];
 
   const isActive = (href) => {

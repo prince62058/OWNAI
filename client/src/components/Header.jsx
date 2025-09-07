@@ -10,6 +10,7 @@ export default function Header() {
 
   const navItems = [
     { label: "Home", href: "/" },
+    { label: "Chat", href: "/chat" },
     { label: "Discover", href: "/discover" },
     { label: "Spaces", href: "/spaces" },
     ...(isAuthenticated ? [{ label: "Library", href: "/library" }] : []),
