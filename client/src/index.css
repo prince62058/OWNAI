@@ -53,27 +53,27 @@
 
   .glow-text {
     text-shadow: 
-      0 0 10px #00ff88,
-      0 0 20px #00ff88,
-      0 0 30px #00ff88,
-      0 0 40px #00ff88;
+      0 0 10px #00d4ff,
+      0 0 20px #00d4ff,
+      0 0 30px #00d4ff,
+      0 0 40px #00d4ff;
     animation: glow-pulse 2s ease-in-out infinite alternate;
   }
 
   @keyframes glow-pulse {
     from {
       text-shadow: 
-        0 0 10px #00ff88,
-        0 0 20px #00ff88,
-        0 0 30px #00ff88,
-        0 0 40px #00ff88;
+        0 0 10px #00d4ff,
+        0 0 20px #00d4ff,
+        0 0 30px #00d4ff,
+        0 0 40px #00d4ff;
     }
     to {
       text-shadow: 
-        0 0 15px #00ff88,
-        0 0 25px #00ff88,
-        0 0 35px #00ff88,
-        0 0 50px #00ff88;
+        0 0 15px #00d4ff,
+        0 0 25px #00d4ff,
+        0 0 35px #00d4ff,
+        0 0 50px #00d4ff;
     }
   }
 
