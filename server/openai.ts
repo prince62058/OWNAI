@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Initialize Google Gemini AI
 const geminiAPI = process.env.GOOGLE_API_KEY ? new GoogleGenerativeAI(process.env.GOOGLE_API_KEY) : null;
-const gemini = geminiAPI ? geminiAPI.getGenerativeModel({ model: "gemini-1.5-flash" }) : null;
+const gemini = geminiAPI ? geminiAPI.getGenerativeModel({ model: "gemini-2.5-flash" }) : null;
 
 interface AISearchResponse {
   content: string;
